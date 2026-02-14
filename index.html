@@ -474,7 +474,7 @@ header{flex-direction:column;gap:12px;text-align:center}
     </div>
     <div class="stats-grid">
       <div class="stat-box"><div class="stat-label">24H HOCH</div><div class="stat-val" id="stat24hH">$1.51</div></div>
-      <div class="stat-box"><div class="stat-label">24H TIEF</div><div class="stat-val" id="stat24hL">$1.38</div></div>
+      <div class="stat-box"><div class="stat-label">24H TIEF</div><div class="stat-val" id="stat24hL">–</div></div>
       <div class="stat-box"><div class="stat-label">7D PERF.</div><div class="stat-val" id="stat7d" style="color:var(--green)">+0.02%</div></div>
       <div class="stat-box"><div class="stat-label">30D PERF.</div><div class="stat-val" id="stat30d" style="color:var(--red)">−31.3%</div></div>
     </div>
@@ -492,16 +492,9 @@ header{flex-direction:column;gap:12px;text-align:center}
   <div class="ai-analysis" id="aiAnalysisBox">
     <div class="ai-header">
       <span class="ai-tag">KI</span>
-      <span class="ai-title">XRP / RIPPLE – DAYTRADER ANALYSE · 15. FEB 2026</span>
+      <span class="ai-title" id="aiTitle">– DAYTRADER ANALYSE WIRD GELADEN –</span>
     </div>
-    <div class="ai-body" id="aiBody">XRP befindet sich nach einem Rückgang von 31% in 30 Tagen in einer kritischen Erholungsphase. Der RSI bei 34.77 signalisiert überverkaufte Bedingungen, während das Volumen von $2.48 Mrd auf erhöhtes Interesse hindeutet.
-
-📍 KURZFRISTIG (1–2 Tage): Die Zone $1.50–$1.52 ist der entscheidende Widerstand. Nur ein klarer Ausbruch darüber mit Volumenanstieg rechtfertigt Long-Positionen.
-
-📍 MITTELFRISTIG (3–7 Tage): Das wahrscheinlichste Szenario ist Konsolidierung zwischen $1.40 und $1.55. Bitcoin (aktuell ~$97.420) bestimmt die Richtung – bleibt BTC unter $100.000, bleibt XRP unter Druck.
-
-⚡ DAYTRADER EMPFEHLUNG: HALTEN / bedingt KAUFEN bei Ausbruch über $1.52.</div>
-
+    <div class="ai-body" id="aiBody">Analyse wird generiert...</div>
   </div>
 
   <!-- MAIN GRID -->
@@ -551,11 +544,7 @@ header{flex-direction:column;gap:12px;text-align:center}
   <div class="card">
     <div class="card-header"><span class="card-title">Kurszonen</span><span class="card-badge badge-day">DAYTRADING</span></div>
     <div id="levelsTable">
-      <div class="level-row"><span class="level-label">Widerstand 2</span><span class="level-price" style="color:var(--red)">$1.77</span><span class="level-type res">RES</span></div>
-      <div class="level-row"><span class="level-label">Widerstand 1</span><span class="level-price" style="color:var(--red)">$1.50</span><span class="level-type res">RES</span></div>
-      <div class="level-row"><span class="level-label">AKTUELL ▶</span><span class="level-price" style="color:var(--accent)">$1.46</span><span class="level-type cur">LIVE</span></div>
-      <div class="level-row"><span class="level-label">Support 1</span><span class="level-price" style="color:var(--green)">$1.35</span><span class="level-type sup">SUP</span></div>
-      <div class="level-row"><span class="level-label">Support 2</span><span class="level-price" style="color:var(--green)">$1.15</span><span class="level-type sup">SUP</span></div>
+      <div class="level-row"><span class="level-label" colspan="3" style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:11px;">Wird geladen...</span></div>
     </div>
   </div>
   <div class="card">
@@ -569,7 +558,7 @@ header{flex-direction:column;gap:12px;text-align:center}
     </div>
     <div class="risk-label" id="riskLabel">HOCH (3/5) · VORSICHT BEI HEBEL</div>
     <div style="margin-top:14px;font-size:13px;color:var(--text);line-height:1.6;" id="riskText">
-      XRP in <strong style="color:var(--yellow)">Hochrisiko-Zone</strong> mit starker BTC-Korrelation. Stop-Losses sind Pflicht.
+      Analyse wird geladen...
     </div>
   </div>
 </div>
@@ -587,13 +576,13 @@ header{flex-direction:column;gap:12px;text-align:center}
         <div class="scenario-bar-bg"><div class="scenario-bar-fill sc-neutral" id="scNeutral" style="width:45%"></div></div>
         <span class="scenario-pct" style="color:var(--yellow)" id="scNeutralPct">45%</span>
       </div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;font-family:'Share Tech Mono',monospace;" id="scNeutralText">$1.40–$1.55 · Konsolidierung</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;font-family:'Share Tech Mono',monospace;" id="scNeutralText">Wird geladen...</div>
       <div class="scenario-row">
         <span class="scenario-label" style="color:var(--green)">🐂 BULLISCH</span>
         <div class="scenario-bar-bg"><div class="scenario-bar-fill sc-bull" id="scBull" style="width:35%"></div></div>
         <span class="scenario-pct" style="color:var(--green)" id="scBullPct">35%</span>
       </div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;font-family:'Share Tech Mono',monospace;" id="scBullText">$1.55–$1.77 · Ausbruch nötig</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;font-family:'Share Tech Mono',monospace;" id="scBullText">Wird geladen...</div>
       <div class="scenario-row">
         <span class="scenario-label" style="color:var(--red)">🐻 BÄRISCH</span>
         <div class="scenario-bar-bg"><div class="scenario-bar-fill sc-bear" id="scBear" style="width:20%"></div></div>
@@ -624,11 +613,7 @@ header{flex-direction:column;gap:12px;text-align:center}
 <div class="card">
   <div class="card-header"><span class="card-title">Daytrader Playbook</span><span class="card-badge badge-day">HEUTE</span></div>
   <div id="playbookContent">
-    <div class="tip-row"><span class="tip-icon">🎯</span><span class="tip-text"><strong>Einstieg Long:</strong> Nur bei Ausbruch über <strong>$1.50–$1.52</strong> mit Volumen bestätigt.</span></div>
-    <div class="tip-row"><span class="tip-icon">🛑</span><span class="tip-text"><strong>Stop-Loss:</strong> Unter <strong>$1.38</strong>. Kein Trade ohne Stop.</span></div>
-    <div class="tip-row"><span class="tip-icon">📈</span><span class="tip-text"><strong>Take Profit:</strong> Ziel 1: <strong>$1.55</strong> · Ziel 2: <strong>$1.65–$1.70</strong></span></div>
-    <div class="tip-row"><span class="tip-icon">👀</span><span class="tip-text"><strong>BTC Watch:</strong> BTC über <strong>$100.000</strong> wäre sehr positiv für XRP.</span></div>
-    <div class="tip-row"><span class="tip-icon">⚡</span><span class="tip-text"><strong>Kein Hebel:</strong> RSI 34 + MACD-Schwäche = kein Leverage. Zu riskant.</span></div>
+    <div class="tip-row"><span class="tip-icon">⏳</span><span class="tip-text">Playbook wird geladen...</span></div>
   </div>
 </div>
 ```
@@ -643,27 +628,27 @@ header{flex-direction:column;gap:12px;text-align:center}
 
 <script>
 const COIN_DATA = {
-  BTC:  { name:'Bitcoin',       price:'$97,420',  change:'-0.8',  h24:'$99,100',  l24:'$95,800',  p7d:'-3.2',  p30d:'-18.5', rsi:'52.3', signal:'neutral', conf:'60', risk:2, fear:32, sup1:'$90,000',sup2:'$82,000',res1:'$100,000',res2:'$108,000',cur:'$97,420',scN:50,scB:35,scBr:15 },
-  ETH:  { name:'Ethereum',      price:'$2,680',   change:'+1.2',  h24:'$2,720',   l24:'$2,590',   p7d:'+2.1',  p30d:'-22.1', rsi:'41.5', signal:'neutral', conf:'58', risk:3, fear:32, sup1:'$2,500',sup2:'$2,200',res1:'$2,800',res2:'$3,200',cur:'$2,680',scN:45,scB:30,scBr:25 },
-  XRP:  { name:'XRP / Ripple',  price:'$1.46',    change:'+4.4',  h24:'$1.51',    l24:'$1.38',    p7d:'+0.02', p30d:'-31.3', rsi:'34.8', signal:'neutral', conf:'65', risk:3, fear:32, sup1:'$1.35',sup2:'$1.15',res1:'$1.50',res2:'$1.77',cur:'$1.46',scN:45,scB:35,scBr:20 },
-  BNB:  { name:'BNB',           price:'$618',     change:'-0.3',  h24:'$628',     l24:'$610',     p7d:'-1.4',  p30d:'-12.0', rsi:'48.2', signal:'neutral', conf:'55', risk:2, fear:35, sup1:'$595',sup2:'$560',res1:'$640',res2:'$680',cur:'$618',scN:50,scB:30,scBr:20 },
-  SOL:  { name:'Solana',        price:'$172',     change:'+2.1',  h24:'$178',     l24:'$166',     p7d:'+5.3',  p30d:'-28.4', rsi:'38.6', signal:'buy',     conf:'62', risk:4, fear:30, sup1:'$155',sup2:'$140',res1:'$185',res2:'$210',cur:'$172',scN:35,scB:45,scBr:20 },
-  ADA:  { name:'Cardano',       price:'$0.784',   change:'+3.1',  h24:'$0.810',   l24:'$0.752',   p7d:'+1.8',  p30d:'-35.2', rsi:'31.4', signal:'buy',     conf:'60', risk:4, fear:28, sup1:'$0.720',sup2:'$0.660',res1:'$0.850',res2:'$0.950',cur:'$0.784',scN:35,scB:40,scBr:25 },
-  AVAX: { name:'Avalanche',     price:'$24.80',   change:'-1.2',  h24:'$25.90',   l24:'$24.10',   p7d:'-4.3',  p30d:'-41.0', rsi:'28.9', signal:'buy',     conf:'58', risk:4, fear:26, sup1:'$22.50',sup2:'$19.00',res1:'$28.00',res2:'$34.00',cur:'$24.80',scN:30,scB:42,scBr:28 },
-  DOGE: { name:'Dogecoin',      price:'$0.241',   change:'-1.4',  h24:'$0.252',   l24:'$0.235',   p7d:'-5.1',  p30d:'-44.0', rsi:'29.3', signal:'neutral', conf:'50', risk:5, fear:25, sup1:'$0.220',sup2:'$0.190',res1:'$0.260',res2:'$0.310',cur:'$0.241',scN:40,scB:30,scBr:30 },
-  DOT:  { name:'Polkadot',      price:'$4.82',    change:'+0.6',  h24:'$4.95',    l24:'$4.71',    p7d:'-2.8',  p30d:'-38.0', rsi:'33.1', signal:'neutral', conf:'52', risk:4, fear:30, sup1:'$4.40',sup2:'$3.90',res1:'$5.20',res2:'$6.00',cur:'$4.82',scN:45,scB:30,scBr:25 },
-  LINK: { name:'Chainlink',     price:'$13.40',   change:'+1.8',  h24:'$13.80',   l24:'$13.00',   p7d:'-1.2',  p30d:'-29.0', rsi:'37.5', signal:'neutral', conf:'57', risk:3, fear:31, sup1:'$12.50',sup2:'$11.00',res1:'$14.50',res2:'$17.00',cur:'$13.40',scN:45,scB:35,scBr:20 },
-  MATIC:{ name:'Polygon',       price:'$0.198',   change:'+2.3',  h24:'$0.205',   l24:'$0.191',   p7d:'-3.5',  p30d:'-46.0', rsi:'27.8', signal:'buy',     conf:'55', risk:5, fear:24, sup1:'$0.180',sup2:'$0.155',res1:'$0.225',res2:'$0.270',cur:'$0.198',scN:30,scB:40,scBr:30 },
-  UNI:  { name:'Uniswap',       price:'$7.45',    change:'+0.9',  h24:'$7.68',    l24:'$7.22',    p7d:'-4.0',  p30d:'-33.0', rsi:'34.2', signal:'neutral', conf:'53', risk:4, fear:29, sup1:'$6.80',sup2:'$5.90',res1:'$8.20',res2:'$9.50',cur:'$7.45',scN:42,scB:33,scBr:25 },
-  ATOM: { name:'Cosmos',        price:'$4.12',    change:'-0.5',  h24:'$4.28',    l24:'$4.02',    p7d:'-6.2',  p30d:'-39.0', rsi:'30.7', signal:'neutral', conf:'50', risk:4, fear:28, sup1:'$3.80',sup2:'$3.40',res1:'$4.50',res2:'$5.20',cur:'$4.12',scN:43,scB:32,scBr:25 },
-  LTC:  { name:'Litecoin',      price:'$86.20',   change:'+1.1',  h24:'$88.50',   l24:'$84.10',   p7d:'-2.0',  p30d:'-25.0', rsi:'40.1', signal:'neutral', conf:'55', risk:3, fear:32, sup1:'$80.00',sup2:'$72.00',res1:'$92.00',res2:'$102.00',cur:'$86.20',scN:48,scB:32,scBr:20 },
-  NEAR: { name:'NEAR Protocol', price:'$2.84',    change:'+2.8',  h24:'$2.95',    l24:'$2.72',    p7d:'-5.5',  p30d:'-42.0', rsi:'29.5', signal:'buy',     conf:'56', risk:5, fear:26, sup1:'$2.55',sup2:'$2.20',res1:'$3.20',res2:'$3.80',cur:'$2.84',scN:33,scB:40,scBr:27 },
-  ARB:  { name:'Arbitrum',      price:'$0.362',   change:'+1.5',  h24:'$0.375',   l24:'$0.350',   p7d:'-7.1',  p30d:'-48.0', rsi:'26.4', signal:'buy',     conf:'54', risk:5, fear:24, sup1:'$0.330',sup2:'$0.290',res1:'$0.400',res2:'$0.460',cur:'$0.362',scN:30,scB:42,scBr:28 },
-  OP:   { name:'Optimism',      price:'$0.724',   change:'+3.2',  h24:'$0.748',   l24:'$0.695',   p7d:'-6.8',  p30d:'-50.0', rsi:'25.9', signal:'buy',     conf:'53', risk:5, fear:23, sup1:'$0.660',sup2:'$0.580',res1:'$0.810',res2:'$0.940',cur:'$0.724',scN:28,scB:44,scBr:28 },
-  SUI:  { name:'Sui',           price:'$2.14',    change:'+4.5',  h24:'$2.22',    l24:'$2.03',    p7d:'+1.2',  p30d:'-36.0', rsi:'36.8', signal:'neutral', conf:'58', risk:4, fear:30, sup1:'$1.90',sup2:'$1.65',res1:'$2.40',res2:'$2.80',cur:'$2.14',scN:38,scB:40,scBr:22 },
-  SHIB: { name:'Shiba Inu',     price:'$0.0000122',change:'-2.1', h24:'$0.0000130',l24:'$0.0000118',p7d:'-8.3',p30d:'-52.0', rsi:'24.1', signal:'neutral', conf:'40', risk:5, fear:22, sup1:'$0.0000110',sup2:'$0.0000095',res1:'$0.0000140',res2:'$0.0000175',cur:'$0.0000122',scN:35,scB:28,scBr:37 },
-  PEPE: { name:'Pepe Coin',     price:'$0.00000812',change:'-3.4',h24:'$0.00000870',l24:'$0.00000785',p7d:'-11.2',p30d:'-58.0',rsi:'21.7',signal:'sell',   conf:'45', risk:5, fear:20, sup1:'$0.0000075',sup2:'$0.0000060',res1:'$0.0000095',res2:'$0.0000120',cur:'$0.00000812',scN:28,scB:22,scBr:50 },
-  FLOKI:{ name:'Floki Inu',     price:'$0.0000648',change:'-1.8', h24:'$0.0000672',l24:'$0.0000631',p7d:'-9.0',p30d:'-55.0', rsi:'23.3', signal:'neutral', conf:'38', risk:5, fear:21, sup1:'$0.0000600',sup2:'$0.0000520',res1:'$0.0000720',res2:'$0.0000880',cur:'$0.0000648',scN:32,scB:24,scBr:44 },
+  BTC:  { name:'Bitcoin',       price:'$97,420',    change:'-0.8',  h24:'$99,100',   l24:'$95,800',   p7d:'-3.2',  p30d:'-18.5', rsi:'52.3', macd:'+120',  williams:'-45.2', ma5:'$99,800',  ma50:'$94,200', bb:'0.0821', vol:'$38.2 Mrd', macdSig:'neutral', rsiSig:'neutral', willSig:'neutral', ma5sig:'sell', ma50sig:'buy', bbSig:'neutral', volSig:'normal', signal:'neutral', conf:'60', risk:2, fear:32, sup1:'$90,000', sup2:'$82,000', res1:'$100,000', res2:'$108,000', cur:'$97,420', scN:50,scB:35,scBr:15, entryLong:'$100,000–$101,000', stop:'$94,500', tp1:'$104,000', tp2:'$108,000–$112,000', btcNote:'BTC ist der Markt – folge dem Trend. Über $100K bullisch.' },
+  ETH:  { name:'Ethereum',      price:'$2,680',     change:'+1.2',  h24:'$2,720',    l24:'$2,590',    p7d:'+2.1',  p30d:'-22.1', rsi:'41.5', macd:'-18.4', williams:'-72.1', ma5:'$2,820',   ma50:'$2,540', bb:'0.1245', vol:'$14.1 Mrd', macdSig:'sell', rsiSig:'neutral', willSig:'neutral', ma5sig:'sell', ma50sig:'buy', bbSig:'neutral', volSig:'normal', signal:'neutral', conf:'58', risk:3, fear:32, sup1:'$2,500', sup2:'$2,200', res1:'$2,800', res2:'$3,200', cur:'$2,680', scN:45,scB:30,scBr:25, entryLong:'$2,800–$2,850', stop:'$2,530', tp1:'$2,980', tp2:'$3,150–$3,300', btcNote:'ETH folgt BTC stark. ETH/BTC Ratio beobachten.' },
+  XRP:  { name:'XRP / Ripple',  price:'$1.46',      change:'+4.4',  h24:'$1.51',     l24:'$1.38',     p7d:'+0.02', p30d:'-31.3', rsi:'34.8', macd:'-0.155',williams:'-89.1', ma5:'$1.73',    ma50:'$1.95', bb:'0.1745', vol:'$2.48 Mrd', macdSig:'sell', rsiSig:'neutral', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'normal', signal:'neutral', conf:'65', risk:3, fear:32, sup1:'$1.35', sup2:'$1.15', res1:'$1.50', res2:'$1.77', cur:'$1.46', scN:45,scB:35,scBr:20, entryLong:'$1.50–$1.52', stop:'$1.38', tp1:'$1.55', tp2:'$1.65–$1.70', btcNote:'XRP korreliert stark mit BTC. BTC über $100K = sehr positiv.' },
+  BNB:  { name:'BNB',           price:'$618',       change:'-0.3',  h24:'$628',      l24:'$610',      p7d:'-1.4',  p30d:'-12.0', rsi:'48.2', macd:'+2.1',  williams:'-51.3', ma5:'$625',     ma50:'$598', bb:'0.0612', vol:'$1.82 Mrd', macdSig:'buy', rsiSig:'neutral', willSig:'neutral', ma5sig:'sell', ma50sig:'buy', bbSig:'neutral', volSig:'normal', signal:'neutral', conf:'55', risk:2, fear:35, sup1:'$595', sup2:'$560', res1:'$640', res2:'$680', cur:'$618', scN:50,scB:30,scBr:20, entryLong:'$640–$645', stop:'$608', tp1:'$658', tp2:'$675–$685', btcNote:'BNB relativ stabil. Binance-News im Auge behalten.' },
+  SOL:  { name:'Solana',        price:'$172',       change:'+2.1',  h24:'$178',      l24:'$166',      p7d:'+5.3',  p30d:'-28.4', rsi:'38.6', macd:'-3.2',  williams:'-78.4', ma5:'$181',     ma50:'$168', bb:'0.1523', vol:'$4.62 Mrd', macdSig:'sell', rsiSig:'neutral', willSig:'buy', ma5sig:'sell', ma50sig:'buy', bbSig:'neutral', volSig:'hoch', signal:'buy', conf:'62', risk:4, fear:30, sup1:'$155', sup2:'$140', res1:'$185', res2:'$210', cur:'$172', scN:35,scB:45,scBr:20, entryLong:'$172–$175', stop:'$162', tp1:'$188', tp2:'$200–$210', btcNote:'SOL zeigt relative Stärke. Ecosystem-News positiv.' },
+  ADA:  { name:'Cardano',       price:'$0.784',     change:'+3.1',  h24:'$0.810',    l24:'$0.752',    p7d:'+1.8',  p30d:'-35.2', rsi:'31.4', macd:'-0.012',williams:'-84.2', ma5:'$0.851',   ma50:'$0.920', bb:'0.1892', vol:'$0.98 Mrd', macdSig:'sell', rsiSig:'buy', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'normal', signal:'buy', conf:'60', risk:4, fear:28, sup1:'$0.720', sup2:'$0.660', res1:'$0.850', res2:'$0.950', cur:'$0.784', scN:35,scB:40,scBr:25, entryLong:'$0.784–$0.800', stop:'$0.745', tp1:'$0.855', tp2:'$0.920–$0.950', btcNote:'ADA stark überverkauft – Bounce möglich, aber kein Trend.' },
+  AVAX: { name:'Avalanche',     price:'$24.80',     change:'-1.2',  h24:'$25.90',    l24:'$24.10',    p7d:'-4.3',  p30d:'-41.0', rsi:'28.9', macd:'-0.88', williams:'-91.2', ma5:'$27.40',   ma50:'$29.10', bb:'0.2134', vol:'$0.74 Mrd', macdSig:'sell', rsiSig:'buy', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'normal', signal:'buy', conf:'58', risk:4, fear:26, sup1:'$22.50', sup2:'$19.00', res1:'$28.00', res2:'$34.00', cur:'$24.80', scN:30,scB:42,scBr:28, entryLong:'$24.80–$25.50', stop:'$22.80', tp1:'$28.50', tp2:'$32.00–$34.00', btcNote:'AVAX extrem überverkauft. Hohes Risiko, aber gutes R/R.' },
+  DOGE: { name:'Dogecoin',      price:'$0.241',     change:'-1.4',  h24:'$0.252',    l24:'$0.235',    p7d:'-5.1',  p30d:'-44.0', rsi:'29.3', macd:'-0.004',williams:'-88.5', ma5:'$0.268',   ma50:'$0.312', bb:'0.1978', vol:'$1.24 Mrd', macdSig:'sell', rsiSig:'buy', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'normal', signal:'neutral', conf:'50', risk:5, fear:25, sup1:'$0.220', sup2:'$0.190', res1:'$0.260', res2:'$0.310', cur:'$0.241', scN:40,scB:30,scBr:30, entryLong:'$0.260–$0.265', stop:'$0.228', tp1:'$0.278', tp2:'$0.295–$0.310', btcNote:'DOGE abhängig von Social Media Hype. Vorsicht!' },
+  DOT:  { name:'Polkadot',      price:'$4.82',      change:'+0.6',  h24:'$4.95',     l24:'$4.71',     p7d:'-2.8',  p30d:'-38.0', rsi:'33.1', macd:'-0.14', williams:'-82.3', ma5:'$5.12',    ma50:'$5.88', bb:'0.1654', vol:'$0.41 Mrd', macdSig:'sell', rsiSig:'neutral', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'niedrig', signal:'neutral', conf:'52', risk:4, fear:30, sup1:'$4.40', sup2:'$3.90', res1:'$5.20', res2:'$6.00', cur:'$4.82', scN:45,scB:30,scBr:25, entryLong:'$5.20–$5.30', stop:'$4.55', tp1:'$5.65', tp2:'$5.90–$6.00', btcNote:'DOT schwach – warte auf Ausbruch über $5.20 vor Kauf.' },
+  LINK: { name:'Chainlink',     price:'$13.40',     change:'+1.8',  h24:'$13.80',    l24:'$13.00',    p7d:'-1.2',  p30d:'-29.0', rsi:'37.5', macd:'-0.42', williams:'-76.8', ma5:'$14.20',   ma50:'$15.80', bb:'0.1432', vol:'$0.62 Mrd', macdSig:'sell', rsiSig:'neutral', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'normal', signal:'neutral', conf:'57', risk:3, fear:31, sup1:'$12.50', sup2:'$11.00', res1:'$14.50', res2:'$17.00', cur:'$13.40', scN:45,scB:35,scBr:20, entryLong:'$14.50–$14.80', stop:'$12.80', tp1:'$15.80', tp2:'$16.80–$17.00', btcNote:'LINK zeigt Erholungsansätze. DeFi-Narrative positiv.' },
+  MATIC:{ name:'Polygon',       price:'$0.198',     change:'+2.3',  h24:'$0.205',    l24:'$0.191',    p7d:'-3.5',  p30d:'-46.0', rsi:'27.8', macd:'-0.006',williams:'-92.4', ma5:'$0.218',   ma50:'$0.265', bb:'0.2241', vol:'$0.38 Mrd', macdSig:'sell', rsiSig:'buy', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'normal', signal:'buy', conf:'55', risk:5, fear:24, sup1:'$0.180', sup2:'$0.155', res1:'$0.225', res2:'$0.270', cur:'$0.198', scN:30,scB:40,scBr:30, entryLong:'$0.198–$0.205', stop:'$0.185', tp1:'$0.228', tp2:'$0.255–$0.270', btcNote:'MATIC/POL sehr stark überverkauft. Rebound möglich.' },
+  UNI:  { name:'Uniswap',       price:'$7.45',      change:'+0.9',  h24:'$7.68',     l24:'$7.22',     p7d:'-4.0',  p30d:'-33.0', rsi:'34.2', macd:'-0.22', williams:'-81.5', ma5:'$7.95',    ma50:'$8.80', bb:'0.1543', vol:'$0.28 Mrd', macdSig:'sell', rsiSig:'neutral', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'niedrig', signal:'neutral', conf:'53', risk:4, fear:29, sup1:'$6.80', sup2:'$5.90', res1:'$8.20', res2:'$9.50', cur:'$7.45', scN:42,scB:33,scBr:25, entryLong:'$8.20–$8.40', stop:'$7.10', tp1:'$8.80', tp2:'$9.20–$9.50', btcNote:'UNI kämpft mit DeFi-Konkurrenz. Volumen niedrig.' },
+  ATOM: { name:'Cosmos',        price:'$4.12',      change:'-0.5',  h24:'$4.28',     l24:'$4.02',     p7d:'-6.2',  p30d:'-39.0', rsi:'30.7', macd:'-0.18', williams:'-86.3', ma5:'$4.48',    ma50:'$4.92', bb:'0.1721', vol:'$0.19 Mrd', macdSig:'sell', rsiSig:'neutral', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'niedrig', signal:'neutral', conf:'50', risk:4, fear:28, sup1:'$3.80', sup2:'$3.40', res1:'$4.50', res2:'$5.20', cur:'$4.12', scN:43,scB:32,scBr:25, entryLong:'$4.50–$4.60', stop:'$3.90', tp1:'$4.90', tp2:'$5.10–$5.20', btcNote:'ATOM schwach. IBC-Ecosystem-News wichtig.' },
+  LTC:  { name:'Litecoin',      price:'$86.20',     change:'+1.1',  h24:'$88.50',    l24:'$84.10',    p7d:'-2.0',  p30d:'-25.0', rsi:'40.1', macd:'-1.24', williams:'-68.4', ma5:'$89.40',   ma50:'$91.20', bb:'0.1124', vol:'$0.55 Mrd', macdSig:'sell', rsiSig:'neutral', willSig:'neutral', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'normal', signal:'neutral', conf:'55', risk:3, fear:32, sup1:'$80.00', sup2:'$72.00', res1:'$92.00', res2:'$102.00', cur:'$86.20', scN:48,scB:32,scBr:20, entryLong:'$92.00–$93.50', stop:'$82.50', tp1:'$98.00', tp2:'$100.00–$102.00', btcNote:'LTC folgt BTC mit Verzögerung. Halving-Effekte beachten.' },
+  NEAR: { name:'NEAR Protocol', price:'$2.84',      change:'+2.8',  h24:'$2.95',     l24:'$2.72',     p7d:'-5.5',  p30d:'-42.0', rsi:'29.5', macd:'-0.09', williams:'-88.7', ma5:'$3.12',    ma50:'$3.58', bb:'0.1988', vol:'$0.32 Mrd', macdSig:'sell', rsiSig:'buy', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'normal', signal:'buy', conf:'56', risk:5, fear:26, sup1:'$2.55', sup2:'$2.20', res1:'$3.20', res2:'$3.80', cur:'$2.84', scN:33,scB:40,scBr:27, entryLong:'$2.84–$2.95', stop:'$2.62', tp1:'$3.25', tp2:'$3.55–$3.80', btcNote:'NEAR AI-Narrative positiv. Starkes Ecosystem.' },
+  ARB:  { name:'Arbitrum',      price:'$0.362',     change:'+1.5',  h24:'$0.375',    l24:'$0.350',    p7d:'-7.1',  p30d:'-48.0', rsi:'26.4', macd:'-0.014',williams:'-93.8', ma5:'$0.398',   ma50:'$0.445', bb:'0.2312', vol:'$0.44 Mrd', macdSig:'sell', rsiSig:'buy', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'hoch', signal:'buy', conf:'54', risk:5, fear:24, sup1:'$0.330', sup2:'$0.290', res1:'$0.400', res2:'$0.460', cur:'$0.362', scN:30,scB:42,scBr:28, entryLong:'$0.362–$0.375', stop:'$0.338', tp1:'$0.405', tp2:'$0.440–$0.460', btcNote:'ARB L2-Marktführer. Extrem überverkauft – Risiko hoch.' },
+  OP:   { name:'Optimism',      price:'$0.724',     change:'+3.2',  h24:'$0.748',    l24:'$0.695',    p7d:'-6.8',  p30d:'-50.0', rsi:'25.9', macd:'-0.028',williams:'-94.2', ma5:'$0.798',   ma50:'$0.880', bb:'0.2456', vol:'$0.28 Mrd', macdSig:'sell', rsiSig:'buy', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'normal', signal:'buy', conf:'53', risk:5, fear:23, sup1:'$0.660', sup2:'$0.580', res1:'$0.810', res2:'$0.940', cur:'$0.724', scN:28,scB:44,scBr:28, entryLong:'$0.724–$0.745', stop:'$0.672', tp1:'$0.820', tp2:'$0.880–$0.940', btcNote:'OP auf historischen Tiefs. Nur für risikobereite Trader.' },
+  SUI:  { name:'Sui',           price:'$2.14',      change:'+4.5',  h24:'$2.22',     l24:'$2.03',     p7d:'+1.2',  p30d:'-36.0', rsi:'36.8', macd:'-0.062',williams:'-77.3', ma5:'$2.28',    ma50:'$2.48', bb:'0.1834', vol:'$0.88 Mrd', macdSig:'sell', rsiSig:'neutral', willSig:'buy', ma5sig:'sell', ma50sig:'sell', bbSig:'neutral', volSig:'hoch', signal:'neutral', conf:'58', risk:4, fear:30, sup1:'$1.90', sup2:'$1.65', res1:'$2.40', res2:'$2.80', cur:'$2.14', scN:38,scB:40,scBr:22, entryLong:'$2.14–$2.22', stop:'$1.96', tp1:'$2.45', tp2:'$2.65–$2.80', btcNote:'SUI zeigt relative Stärke. Gaming/DeFi Ecosystem wächst.' },
+  SHIB: { name:'Shiba Inu',     price:'$0.0000122', change:'-2.1',  h24:'$0.0000130',l24:'$0.0000118',p7d:'-8.3',  p30d:'-52.0', rsi:'24.1', macd:'-0.000001',williams:'-95.1',ma5:'$0.0000138',ma50:'$0.0000165',bb:'0.2541',vol:'$0.62 Mrd',macdSig:'sell',rsiSig:'buy',willSig:'buy',ma5sig:'sell',ma50sig:'sell',bbSig:'neutral',volSig:'normal', signal:'neutral', conf:'40', risk:5, fear:22, sup1:'$0.0000110', sup2:'$0.0000095', res1:'$0.0000140', res2:'$0.0000175', cur:'$0.0000122', scN:35,scB:28,scBr:37, entryLong:'$0.0000140–$0.0000145', stop:'$0.0000112', tp1:'$0.0000158', tp2:'$0.0000170–$0.0000175', btcNote:'SHIB reiner Meme-Coin. Ohne BTC-Rallye kein Upside.' },
+  PEPE: { name:'Pepe Coin',     price:'$0.00000812',change:'-3.4',  h24:'$0.00000870',l24:'$0.00000785',p7d:'-11.2',p30d:'-58.0',rsi:'21.7', macd:'-0.0000004',williams:'-96.8',ma5:'$0.00000945',ma50:'$0.0000118',bb:'0.2812',vol:'$0.94 Mrd',macdSig:'sell',rsiSig:'buy',willSig:'buy',ma5sig:'sell',ma50sig:'sell',bbSig:'neutral',volSig:'hoch', signal:'sell', conf:'45', risk:5, fear:20, sup1:'$0.0000075', sup2:'$0.0000060', res1:'$0.0000095', res2:'$0.0000120', cur:'$0.00000812', scN:28,scB:22,scBr:50, entryLong:'Kein Long empfohlen', stop:'$0.0000076', tp1:'$0.0000095', tp2:'$0.0000110–$0.0000120', btcNote:'PEPE extrem riskant. Nur mit kleiner Position und engem Stop.' },
+  FLOKI:{ name:'Floki Inu',     price:'$0.0000648', change:'-1.8',  h24:'$0.0000672',l24:'$0.0000631',p7d:'-9.0',  p30d:'-55.0', rsi:'23.3', macd:'-0.000003',williams:'-93.5',ma5:'$0.0000724',ma50:'$0.0000885',bb:'0.2634',vol:'$0.14 Mrd',macdSig:'sell',rsiSig:'buy',willSig:'buy',ma5sig:'sell',ma50sig:'sell',bbSig:'neutral',volSig:'niedrig', signal:'neutral', conf:'38', risk:5, fear:21, sup1:'$0.0000600', sup2:'$0.0000520', res1:'$0.0000720', res2:'$0.0000880', cur:'$0.0000648', scN:32,scB:24,scBr:44, entryLong:'$0.0000648–$0.0000670', stop:'$0.0000608', tp1:'$0.0000725', tp2:'$0.0000840–$0.0000880', btcNote:'FLOKI Meme-Coin. Extrem volatil und manipulierbar.' },
 };
 
 const SIGNAL_LABELS = {
@@ -710,11 +695,13 @@ async function runAnalysis() {
     sub.textContent = 'Claude KI generiert Analyse...';
     const analysis = await getAIAnalysis(sym, d);
     document.getElementById('aiBody').textContent = analysis;
-    document.getElementById('aiAnalysisBox').querySelector('.ai-title').textContent =
+    document.getElementById('aiTitle').textContent =
       `${d.name.toUpperCase()} (${sym}) – DAYTRADER ANALYSE · 15. FEB 2026`;
   } catch(e) {
+    document.getElementById('aiTitle').textContent =
+      `${d.name.toUpperCase()} (${sym}) – ANALYSE · 15. FEB 2026`;
     document.getElementById('aiBody').textContent =
-      `Analyse für ${d.name} (${sym}):\n\nAktueller Kurs: ${d.price} (${d.change > 0 ? '+':''}${d.change}%)\n\nSignal: ${SIGNAL_LABELS[d.signal].text} – Konfidenz ${d.conf}%\n\nRSI: ${d.rsi} | Support: ${d.sup1} | Widerstand: ${d.res1}\n\nBitte prüfe die technischen Daten im Dashboard für Details.`;
+      `Analyse für ${d.name} (${sym}):\n\nAktueller Kurs: ${d.price} (${parseFloat(d.change) >= 0 ? '+':''}${d.change}%)\n\nSignal: ${SIGNAL_LABELS[d.signal].text} – Konfidenz ${d.conf}%\n\nRSI: ${d.rsi} | MACD: ${d.macd}\nSupport: ${d.sup1} / ${d.sup2}\nWiderstand: ${d.res1} / ${d.res2}\n\n📍 KURZFRISTIG: Beobachte Zone ${d.res1} als Schlüsselwiderstand.\n📍 MITTELFRISTIG: Support bei ${d.sup1} muss halten.\n⚡ EMPFEHLUNG: Einstieg bei ${d.entryLong} · Stop: ${d.stop} · TP: ${d.tp1}`;
   }
 
   overlay.classList.remove('active');
@@ -801,30 +788,124 @@ function updateStaticUI(sym, d) {
   document.getElementById('chartPriceText').textContent = d.price;
   document.getElementById('chartSupText').textContent = `SUPPORT ${d.sup1}`;
   document.getElementById('chartResText').textContent = `WIDERSTAND ${d.res1}`;
+
+  // Indikatoren-Tabelle komplett neu rendern
+  const sigClass = { buy:'sig-buy', sell:'sig-sell', neutral:'sig-neutral' };
+  const sigColor = { buy:'var(--green)', sell:'var(--red)', neutral:'var(--yellow)' };
+  const sigText  = { buy:'KAUFEN', sell:'VERKAUFEN', neutral:'NEUTRAL' };
+
+  const rsiColor = parseFloat(d.rsi) < 30 ? 'var(--green)' : parseFloat(d.rsi) > 70 ? 'var(--red)' : 'var(--yellow)';
+  const rsiSigTxt = parseFloat(d.rsi) < 30 ? 'ÜBERVERKAUFT' : parseFloat(d.rsi) > 70 ? 'ÜBERKAUFT' : 'NEUTRAL';
+  const rsiSigCls = parseFloat(d.rsi) < 30 ? 'sig-buy' : parseFloat(d.rsi) > 70 ? 'sig-sell' : 'sig-neutral';
+
+  const macdColor = d.macdSig === 'buy' ? 'var(--green)' : d.macdSig === 'sell' ? 'var(--red)' : 'var(--yellow)';
+  const ma5Color  = d.ma5sig === 'buy'  ? 'var(--green)' : 'var(--red)';
+  const ma50Color = d.ma50sig === 'buy' ? 'var(--green)' : 'var(--red)';
+
+  document.getElementById('indicatorsTable').innerHTML = `
+    <div class="indicator-row">
+      <span class="ind-name">RSI (14)</span>
+      <span class="ind-val" style="color:${rsiColor}">${d.rsi}</span>
+      <span class="ind-signal ${rsiSigCls}">${rsiSigTxt}</span>
+    </div>
+    <div class="indicator-row">
+      <span class="ind-name">MACD (12,26)</span>
+      <span class="ind-val" style="color:${macdColor}">${d.macd}</span>
+      <span class="ind-signal ${sigClass[d.macdSig]}">${d.macdSig === 'buy' ? 'BULLISCH' : d.macdSig === 'sell' ? 'BÄRISCH' : 'NEUTRAL'}</span>
+    </div>
+    <div class="indicator-row">
+      <span class="ind-name">Williams %R</span>
+      <span class="ind-val" style="color:${sigColor[d.willSig]}">${d.williams}</span>
+      <span class="ind-signal ${sigClass[d.willSig]}">${d.willSig === 'buy' ? 'ÜBERVERKAUFT' : d.willSig === 'sell' ? 'ÜBERKAUFT' : 'NEUTRAL'}</span>
+    </div>
+    <div class="indicator-row">
+      <span class="ind-name">MA 5 (SMA)</span>
+      <span class="ind-val" style="color:${ma5Color}">${d.ma5}</span>
+      <span class="ind-signal ${sigClass[d.ma5sig]}">${sigText[d.ma5sig]}</span>
+    </div>
+    <div class="indicator-row">
+      <span class="ind-name">MA 50 (SMA)</span>
+      <span class="ind-val" style="color:${ma50Color}">${d.ma50}</span>
+      <span class="ind-signal ${sigClass[d.ma50sig]}">${sigText[d.ma50sig]}</span>
+    </div>
+    <div class="indicator-row">
+      <span class="ind-name">Bollinger Bands</span>
+      <span class="ind-val" style="color:var(--yellow)">${d.bb}</span>
+      <span class="ind-signal sig-neutral">UNTEN</span>
+    </div>
+    <div class="indicator-row">
+      <span class="ind-name">Volumen (24H)</span>
+      <span class="ind-val" style="color:var(--accent)">${d.vol}</span>
+      <span class="ind-signal ${d.volSig === 'hoch' ? 'sig-buy' : d.volSig === 'niedrig' ? 'sig-sell' : 'sig-neutral'}">${d.volSig.toUpperCase()}</span>
+    </div>
+  `;
+
+  // Scenario-Beschreibungen aktualisieren
+  document.getElementById('scNeutralText').textContent = `${d.sup1} – ${d.res1} · Konsolidierung`;
+  document.getElementById('scBullText').textContent = `${d.res1} – ${d.res2} · Ausbruch nötig`;
+  document.getElementById('scBearText').textContent = `${d.sup2} – ${d.sup1} · Abwärtsdruck`;
+
+  // Playbook komplett neu rendern
+  const isLeverageOk = d.risk <= 2;
+  const leverageTip = isLeverageOk
+    ? `RSI ${d.rsi} & Markt stabil – moderater Hebel (2–3x) möglich.`
+    : `RSI ${d.rsi} & Risiko ${d.risk}/5 – <strong>kein Leverage</strong>. Zu hohes Liquidationsrisiko.`;
+
+  document.getElementById('playbookContent').innerHTML = `
+    <div class="tip-row">
+      <span class="tip-icon">🎯</span>
+      <span class="tip-text"><strong>Einstieg Long:</strong> Nur bei bestätigtem Ausbruch über <strong>${d.entryLong}</strong> mit Volumen. Nicht vorher kaufen.</span>
+    </div>
+    <div class="tip-row">
+      <span class="tip-icon">🛑</span>
+      <span class="tip-text"><strong>Stop-Loss:</strong> Unter <strong>${d.stop}</strong> setzen. Kein Trade ohne Stop in diesem Markt.</span>
+    </div>
+    <div class="tip-row">
+      <span class="tip-icon">📈</span>
+      <span class="tip-text"><strong>Take Profit:</strong> Erstes Ziel <strong>${d.tp1}</strong>, Zweites Ziel <strong>${d.tp2}</strong>. Gewinne sichern!</span>
+    </div>
+    <div class="tip-row">
+      <span class="tip-icon">👀</span>
+      <span class="tip-text"><strong>Markt-Kontext:</strong> ${d.btcNote}</span>
+    </div>
+    <div class="tip-row">
+      <span class="tip-icon">⚡</span>
+      <span class="tip-text">${leverageTip}</span>
+    </div>
+  `;
+
+  // Risiko-Text
+  const riskTexts = [
+    '', 
+    `${d.name} gilt als <strong style="color:var(--green)">vergleichsweise stabil</strong>. Dennoch Stop-Loss setzen.`,
+    `${d.name} hat <strong style="color:var(--green)">moderates Risiko</strong>. Stop-Loss und Positionsgröße beachten.`,
+    `${d.name} befindet sich in einer <strong style="color:var(--yellow)">Hochrisiko-Zone</strong>. Strenge Stop-Losses sind Pflicht.`,
+    `${d.name} zeigt <strong style="color:var(--orange)">sehr hohes Risiko</strong>. Nur kleine Positionen, enger Stop.`,
+    `${d.name} ist <strong style="color:var(--red)">extrem riskant</strong>. Nur für erfahrene Trader mit kleiner Position.`
+  ];
+  document.getElementById('riskText').innerHTML = riskTexts[d.risk];
 }
 
 async function getAIAnalysis(sym, d) {
   const prompt = `Du bist ein professioneller Krypto-Analyst mit Fokus auf Daytrading. Erstelle eine präzise, professionelle Kurzanalyse für ${d.name} (${sym}) auf Deutsch.
 
-Aktuelle Daten (15. Februar 2026):
-- Kurs: ${d.price}
-- 24H Änderung: ${d.change}%
-- 7-Tage Performance: ${d.p7d}%
-- 30-Tage Performance: ${d.p30d}%
-- RSI: ${d.rsi}
-- Support 1: ${d.sup1} | Support 2: ${d.sup2}
-- Widerstand 1: ${d.res1} | Widerstand 2: ${d.res2}
-- Signal: ${SIGNAL_LABELS[d.signal].text}
-- Risiko-Level: ${d.risk}/5
+Aktuelle Marktdaten (15. Februar 2026):
+- Kurs: ${d.price} | 24H: ${d.change}% | 7T: ${d.p7d}% | 30T: ${d.p30d}%
+- RSI (14): ${d.rsi} | MACD: ${d.macd} | Williams %R: ${d.williams}
+- MA5: ${d.ma5} | MA50: ${d.ma50} | Volumen 24H: ${d.vol}
+- Support: ${d.sup1} / ${d.sup2} | Widerstand: ${d.res1} / ${d.res2}
+- Signal: ${SIGNAL_LABELS[d.signal].text} | Konfidenz: ${d.conf}% | Risiko: ${d.risk}/5
 - Fear & Greed Index: ${d.fear}
+- Einstieg Long: ${d.entryLong} | Stop-Loss: ${d.stop}
+- Take Profit 1: ${d.tp1} | Take Profit 2: ${d.tp2}
 
-Erstelle eine strukturierte Analyse mit:
-1. Kurzüberblick (2-3 Sätze zur aktuellen Lage)
-2. 📍 KURZFRISTIG (1-2 Tage): Was ist zu erwarten?
-3. 📍 MITTELFRISTIG (3-7 Tage): Hauptszenario?
-4. ⚡ DAYTRADER EMPFEHLUNG: Konkreter Rat mit Einstieg/Stop/Ziel
+Erstelle eine strukturierte Analyse mit genau diesen 4 Abschnitten:
+1. Kurzüberblick zur aktuellen Lage (2-3 Sätze, konkret auf ${sym} bezogen)
+2. 📍 KURZFRISTIG (1-2 Tage): Konkrete Erwartung mit Kurszielen
+3. 📍 MITTELFRISTIG (3-7 Tage): Hauptszenario mit Wahrscheinlichkeit
+4. ⚡ DAYTRADER EMPFEHLUNG: Klarer Rat (Kaufen/Halten/Verkaufen) mit den obigen Einstieg/Stop/TP-Levels
 
-Maximal 200 Wörter. Professionell, präzise, kein Finanzberat-Disclaimer nötig.`;
+Wichtig: Beziehe dich immer namentlich auf ${sym}/${d.name}, nie auf andere Coins. Maximal 220 Wörter. Professionell und präzise.`;
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
