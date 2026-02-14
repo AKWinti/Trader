@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Daytrader Signal Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #040810;
+    --surface: #080f1e;
+    --surface2: #0d1a2e;
+    --accent: #00d4ff;
+    --red: #ff3a3a;
+    --green: #00ff88;
+    --yellow: #ffd700;
+    --orange: #ff8c00;
+    --text: #c8deff;
+    --text-dim: #4a6080;
+    --border: #0d2a45;
+    --glow: 0 0 20px rgba(0,212,255,0.3);
+    --glow-green: 0 0 20px rgba(0,255,136,0.4);
+    --glow-red: 0 0 20px rgba(255,58,58,0.4);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
+    background-size:50px 50px;
+    animation:gridMove 20s linear infinite;
+    pointer-events:none; z-index:0;
+  }
+  @keyframes gridMove { 0%{transform:translateY(0)} 100%{transform:translateY(50px)} }
+  body::after {
+    content:''; position:fixed; inset:0;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.05) 2px,rgba(0,0,0,0.05) 4px);
+    pointer-events:none; z-index:0;
+  }
+  .container { max-width:1400px; margin:0 auto; padding:20px; position:relative; z-index:1; }
+
+/* HEADER */
+header {
+display:flex; justify-content:space-between; align-items:center;
+padding:24px 0 20px; border-bottom:1px solid var(–border);
+margin-bottom:0; animation:fadeDown 0.6s ease both;
+}
+.logo { display:flex; align-items:center; gap:16px; }
+.logo-icon {
+width:48px; height:48px;
+background:linear-gradient(135deg,#00d4ff,#0050aa);
+border-radius:12px; display:flex; align-items:center; justify-content:center;
+font-family:‘Orbitron’,monospace; font-weight:900; font-size:14px; color:#fff;
+box-shadow:var(–glow); position:relative; overflow:hidden;
+transition: all 0.4s ease;
+}
+.logo-icon::after {
+content:’’; position:absolute; top:-50%; left:-50%; width:200%; height:200%;
+background:linear-gradient(transparent,rgba(255,255,255,0.1),transparent);
+animation:shine 3s infinite;
+}
+@keyframes shine { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+.logo h1 { font-family:‘Orbitron’,monospace; font-size:22px; font-weight:900; color:#fff; letter-spacing:3px; }
+.logo p { font-family:‘Share Tech Mono’,monospace; font-size:11px; color:var(–accent); letter-spacing:2px; }
+.header-right { display:flex; align-items:center; gap:20px; }
+.live-badge {
+display:inline-flex; align-items:center; gap:8px;
+background:rgba(0,255,136,0.1); border:1px solid var(–green);
+border-radius:20px; padding:6px 14px;
+font-family:‘Share Tech Mono’,monospace; font-size:12px; color:var(–green); letter-spacing:1px;
+}
+.live-dot { width:8px; height:8px; border-radius:50%; background:var(–green); animation:pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+.timestamp { font-family:‘Share Tech Mono’,monospace; font-size:11px; color:var(–text-dim); }
+
+/* COIN SELECTOR BAR */
+.selector-bar {
+background: var(–surface);
+border-bottom: 1px solid var(–border);
+padding: 16px 20px;
+display: flex;
+align-items: center;
+gap: 16px;
+flex-wrap: wrap;
+position: sticky;
+top: 0;
+z-index: 100;
+backdrop-filter: blur(10px);
+}
+.selector-label {
+font-family:‘Share Tech Mono’,monospace;
+font-size:11px; color:var(–text-dim); letter-spacing:2px;
+white-space: nowrap;
+}
+.coin-select-wrap {
+position: relative;
+flex-shrink: 0;
+}
+.coin-select {
+appearance: none;
+background: rgba(0,212,255,0.07);
+border: 1px solid var(–accent);
+border-radius: 10px;
+color: #fff;
+font-family:‘Orbitron’,monospace;
+font-size: 14px;
+font-weight: 700;
+padding: 10px 44px 10px 16px;
+cursor: pointer;
+outline: none;
+letter-spacing: 1px;
+min-width: 200px;
+box-shadow: var(–glow);
+transition: all 0.3s;
+}
+.coin-select:hover, .coin-select:focus {
+background: rgba(0,212,255,0.15);
+box-shadow: 0 0 30px rgba(0,212,255,0.4);
+}
+.coin-select option {
+background: #0a1525;
+color: #fff;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 13px;
+}
+.select-arrow {
+position:absolute; right:14px; top:50%; transform:translateY(-50%);
+color:var(–accent); pointer-events:none; font-size:12px;
+}
+.analyze-btn {
+background: linear-gradient(135deg, #00d4ff, #0055cc);
+border: none; border-radius: 10px;
+color: #fff; font-family:‘Orbitron’,monospace;
+font-size: 12px; font-weight: 700;
+padding: 11px 24px; cursor: pointer;
+letter-spacing: 2px;
+box-shadow: var(–glow);
+transition: all 0.3s;
+white-space: nowrap;
+}
+.analyze-btn:hover { transform:translateY(-2px); box-shadow:0 0 40px rgba(0,212,255,0.5); }
+.analyze-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+/* QUICK COIN CHIPS */
+.coin-chips {
+display: flex; gap: 8px; flex-wrap: wrap;
+}
+.chip {
+background: rgba(255,255,255,0.05);
+border: 1px solid var(–border);
+border-radius: 20px;
+padding: 5px 12px;
+font-family:‘Share Tech Mono’,monospace;
+font-size: 11px; color: var(–text-dim);
+cursor: pointer;
+transition: all 0.2s;
+letter-spacing: 1px;
+}
+.chip:hover, .chip.active {
+background: rgba(0,212,255,0.1);
+border-color: var(–accent);
+color: var(–accent);
+}
+
+/* TICKER */
+.ticker-wrap {
+background:var(–surface); border-bottom:1px solid var(–border);
+padding:8px 0; overflow:hidden; position:relative;
+}
+.ticker-content {
+display:flex; gap:60px; animation:ticker 30s linear infinite; white-space:nowrap;
+}
+@keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.ticker-item { display:inline-flex; align-items:center; gap:10px; font-family:‘Share Tech Mono’,monospace; font-size:12px; color:var(–text-dim); }
+.ticker-item .tk-sym { color:var(–accent); font-weight:700; }
+.ticker-item .tk-up { color:var(–green); }
+.ticker-item .tk-down { color:var(–red); }
+
+/* LOADING */
+.loading-overlay {
+display: none;
+position: fixed; inset: 0;
+background: rgba(4,8,16,0.85);
+z-index: 200;
+align-items: center; justify-content: center;
+flex-direction: column; gap: 20px;
+backdrop-filter: blur(4px);
+}
+.loading-overlay.active { display: flex; }
+.loading-spinner {
+width: 60px; height: 60px;
+border: 3px solid rgba(0,212,255,0.2);
+border-top-color: var(–accent);
+border-radius: 50%;
+animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+font-family:‘Orbitron’,monospace; font-size:14px;
+color:var(–accent); letter-spacing:3px;
+animation: flicker 1.5s ease-in-out infinite;
+}
+.loading-sub { font-family:‘Share Tech Mono’,monospace; font-size:11px; color:var(–text-dim); letter-spacing:1px; }
+@keyframes flicker { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* PRICE HERO */
+.price-hero {
+background:linear-gradient(135deg,var(–surface) 0%,#0a1525 100%);
+border:1px solid var(–border); border-radius:16px;
+padding:32px; margin-bottom:24px;
+display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px; align-items:center;
+position:relative; overflow:hidden;
+animation:fadeUp 0.5s ease both;
+}
+.price-hero-bg {
+position:absolute; right:-20px; top:50%; transform:translateY(-50%);
+font-family:‘Orbitron’,monospace; font-size:160px; font-weight:900;
+color:rgba(0,212,255,0.04); pointer-events:none; letter-spacing:-5px;
+transition: all 0.5s ease;
+}
+.current-price { text-align:center; }
+.price-label { font-family:‘Share Tech Mono’,monospace; font-size:11px; color:var(–text-dim); letter-spacing:3px; margin-bottom:8px; }
+.price-value { font-family:‘Orbitron’,monospace; font-size:48px; font-weight:900; color:#fff; letter-spacing:-1px; line-height:1; text-shadow:0 0 30px rgba(0,212,255,0.5); }
+.price-change { font-family:‘Orbitron’,monospace; font-size:18px; font-weight:700; margin-top:8px; }
+.price-change.up { color:var(–green); }
+.price-change.down { color:var(–red); }
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.stat-box { background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.15); border-radius:10px; padding:12px 16px; }
+.stat-label { font-family:‘Share Tech Mono’,monospace; font-size:10px; color:var(–text-dim); letter-spacing:1px; margin-bottom:4px; }
+.stat-val { font-family:‘Orbitron’,monospace; font-size:14px; font-weight:700; color:var(–accent); }
+
+/* SIGNAL */
+.signal-box { border-radius:16px; padding:28px; text-align:center; position:relative; overflow:hidden; border:2px solid; transition:all 0.5s; }
+.signal-box.neutral { background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,140,0,0.05)); border-color:var(–yellow); box-shadow:0 0 40px rgba(255,215,0,0.15); }
+.signal-box.buy { background:linear-gradient(135deg,rgba(0,255,136,0.1),rgba(0,180,90,0.05)); border-color:var(–green); box-shadow:var(–glow-green); }
+.signal-box.sell { background:linear-gradient(135deg,rgba(255,58,58,0.1),rgba(180,0,0,0.05)); border-color:var(–red); box-shadow:var(–glow-red); }
+.signal-label { font-family:‘Share Tech Mono’,monospace; font-size:11px; color:var(–text-dim); letter-spacing:3px; margin-bottom:12px; }
+.signal-value { font-family:‘Orbitron’,monospace; font-size:32px; font-weight:900; letter-spacing:3px; margin-bottom:10px; }
+.neutral .signal-value { color:var(–yellow); text-shadow:0 0 20px rgba(255,215,0,0.5); }
+.buy .signal-value { color:var(–green); text-shadow:0 0 20px rgba(0,255,136,0.5); }
+.sell .signal-value { color:var(–red); text-shadow:0 0 20px rgba(255,58,58,0.5); }
+.signal-sub { font-size:13px; color:var(–text); font-weight:600; letter-spacing:1px; }
+.signal-confidence { margin-top:14px; font-family:‘Share Tech Mono’,monospace; font-size:12px; }
+.neutral .signal-confidence { color:var(–yellow); }
+.buy .signal-confidence { color:var(–green); }
+.sell .signal-confidence { color:var(–red); }
+
+/* GRIDS */
+.main-grid { display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:20px; }
+.bottom-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:20px; }
+
+/* CARD */
+.card { background:var(–surface); border:1px solid var(–border); border-radius:16px; padding:24px; position:relative; overflow:hidden; transition:border-color 0.3s; }
+.card:hover { border-color:rgba(0,212,255,0.3); }
+.card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(–border); }
+.card-title { font-family:‘Orbitron’,monospace; font-size:12px; font-weight:700; color:var(–accent); letter-spacing:2px; text-transform:uppercase; }
+.card-badge { font-family:‘Share Tech Mono’,monospace; font-size:10px; padding:3px 10px; border-radius:10px; letter-spacing:1px; }
+.badge-live { background:rgba(0,255,136,0.15); color:var(–green); border:1px solid rgba(0,255,136,0.3); }
+.badge-day { background:rgba(0,212,255,0.15); color:var(–accent); border:1px solid rgba(0,212,255,0.3); }
+.badge-7d { background:rgba(255,140,0,0.15); color:var(–orange); border:1px solid rgba(255,140,0,0.3); }
+
+/* INDICATORS */
+.indicator-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+.indicator-row:last-child { border-bottom:none; }
+.ind-name { font-family:‘Share Tech Mono’,monospace; font-size:12px; color:var(–text-dim); letter-spacing:1px; }
+.ind-val { font-family:‘Orbitron’,monospace; font-size:13px; font-weight:700; }
+.ind-signal { font-family:‘Share Tech Mono’,monospace; font-size:10px; padding:3px 8px; border-radius:8px; letter-spacing:1px; min-width:70px; text-align:center; }
+.sig-buy { background:rgba(0,255,136,0.15); color:var(–green); }
+.sig-sell { background:rgba(255,58,58,0.15); color:var(–red); }
+.sig-neutral { background:rgba(255,215,0,0.15); color:var(–yellow); }
+
+/* CHART */
+.chart-wrap { margin:16px 0; }
+.chart-wrap svg { width:100%; }
+.chart-labels { display:flex; justify-content:space-between; font-family:‘Share Tech Mono’,monospace; font-size:10px; color:var(–text-dim); margin-top:6px; }
+
+/* LEVELS */
+.level-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+.level-row:last-child { border-bottom:none; }
+.level-label { font-family:‘Share Tech Mono’,monospace; font-size:12px; color:var(–text-dim); }
+.level-price { font-family:‘Orbitron’,monospace; font-size:15px; font-weight:700; }
+.level-type { font-family:‘Share Tech Mono’,monospace; font-size:10px; padding:3px 8px; border-radius:8px; }
+.res { color:var(–red); background:rgba(255,58,58,0.1); }
+.sup { color:var(–green); background:rgba(0,255,136,0.1); }
+.cur { color:var(–accent); background:rgba(0,212,255,0.1); }
+
+/* SENTIMENT */
+.sentiment-bar-bg { height:20px; background:linear-gradient(90deg,#ff3a3a,#ffd700,#00ff88); border-radius:10px; position:relative; margin-bottom:8px; overflow:hidden; }
+.sentiment-needle { position:absolute; top:-4px; width:4px; height:28px; background:#fff; border-radius:2px; transform:translateX(-50%); box-shadow:0 0 10px rgba(255,255,255,0.8); transition:left 1s ease; }
+.sentiment-labels { display:flex; justify-content:space-between; font-family:‘Share Tech Mono’,monospace; font-size:10px; color:var(–text-dim); }
+
+/* SCENARIOS */
+.scenario-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.scenario-label { font-family:‘Share Tech Mono’,monospace; font-size:11px; min-width:90px; }
+.scenario-bar-bg { flex:1; height:10px; background:rgba(255,255,255,0.06); border-radius:5px; overflow:hidden; }
+.scenario-bar-fill { height:100%; border-radius:5px; transition:width 1.5s ease; }
+.sc-neutral { background:linear-gradient(90deg,#ffd700,#ffa500); }
+.sc-bull { background:linear-gradient(90deg,#00d4aa,#00ff88); }
+.sc-bear { background:linear-gradient(90deg,#cc0000,#ff3a3a); }
+
+/* TIPS */
+.tip-row { display:flex; gap:14px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.04); align-items:flex-start; }
+.tip-row:last-child { border-bottom:none; }
+.tip-icon { font-size:18px; flex-shrink:0; width:26px; }
+.tip-text { font-size:13px; line-height:1.5; color:var(–text); }
+.tip-text strong { color:#fff; font-weight:700; }
+
+/* RISK */
+.risk-circles { display:flex; gap:8px; margin-top:12px; }
+.risk-circle { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:‘Orbitron’,monospace; font-size:10px; font-weight:900; border:2px solid; }
+.rc-filled-red { background:rgba(255,58,58,0.3); border-color:var(–red); color:var(–red); }
+.rc-filled-yellow { background:rgba(255,215,0,0.3); border-color:var(–yellow); color:var(–yellow); }
+.rc-empty { background:transparent; border-color:var(–border); color:var(–text-dim); }
+.risk-label { font-family:‘Share Tech Mono’,monospace; font-size:11px; color:var(–text-dim); margin-top:8px; letter-spacing:1px; }
+
+/* AI ANALYSIS BOX */
+.ai-analysis {
+background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(0,80,170,0.05));
+border: 1px solid rgba(0,212,255,0.2);
+border-radius:16px; padding:24px; margin-bottom:20px;
+animation:fadeUp 0.5s ease both;
+}
+.ai-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid rgba(0,212,255,0.1); }
+.ai-tag {
+background:linear-gradient(135deg,#00d4ff,#0055cc);
+color:#fff; font-family:‘Orbitron’,monospace; font-size:10px; font-weight:900;
+padding:4px 10px; border-radius:6px; letter-spacing:2px;
+}
+.ai-title { font-family:‘Orbitron’,monospace; font-size:13px; color:var(–accent); letter-spacing:2px; }
+.ai-body { font-size:14px; line-height:1.7; color:var(–text); white-space:pre-wrap; }
+
+/* FOOTER */
+footer { border-top:1px solid var(–border); padding:20px 0; display:flex; justify-content:space-between; align-items:center; }
+.disclaimer { font-family:‘Share Tech Mono’,monospace; font-size:10px; color:var(–text-dim); letter-spacing:0.5px; }
+.footer-brand { font-family:‘Orbitron’,monospace; font-size:11px; color:var(–text-dim); letter-spacing:2px; }
+
+/* ANIMATIONS */
+@keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* RESPONSIVE */
+@media(max-width:900px){
+.main-grid{grid-template-columns:1fr}
+.bottom-grid{grid-template-columns:1fr}
+.price-hero{grid-template-columns:1fr;text-align:center}
+.price-value{font-size:38px}
+header{flex-direction:column;gap:12px;text-align:center}
+.header-right{justify-content:center}
+.selector-bar{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">ANALYSE LÄUFT</div>
+  <div class="loading-sub" id="loadingSub">KI analysiert Marktdaten...</div>
+</div>
+
+<div class="container">
+  <header>
+    <div class="logo">
+      <div class="logo-icon" id="logoIcon">◈</div>
+      <div>
+        <h1 id="dashTitle">CRYPTO SIGNAL</h1>
+        <p>KI-Powered Daytrader Dashboard</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-badge"><div class="live-dot"></div>KI ANALYSE</div>
+      <div class="timestamp" id="timestamp"></div>
+    </div>
+  </header>
+</div>
+
+<!-- SELECTOR BAR -->
+
+<div class="selector-bar">
+  <span class="selector-label">COIN AUSWÄHLEN:</span>
+  <div class="coin-select-wrap">
+    <select class="coin-select" id="coinSelect">
+      <optgroup label="── Top Coins ──">
+        <option value="BTC" data-name="Bitcoin" data-symbol="₿">₿ BTC – Bitcoin</option>
+        <option value="ETH" data-name="Ethereum" data-symbol="Ξ">Ξ ETH – Ethereum</option>
+        <option value="XRP" selected data-name="XRP / Ripple" data-symbol="✕">✕ XRP – Ripple</option>
+        <option value="BNB" data-name="BNB" data-symbol="◈">◈ BNB – Binance Coin</option>
+        <option value="SOL" data-name="Solana" data-symbol="◎">◎ SOL – Solana</option>
+        <option value="ADA" data-name="Cardano" data-symbol="₳">₳ ADA – Cardano</option>
+        <option value="AVAX" data-name="Avalanche" data-symbol="△">△ AVAX – Avalanche</option>
+        <option value="DOGE" data-name="Dogecoin" data-symbol="Ð">Ð DOGE – Dogecoin</option>
+        <option value="DOT" data-name="Polkadot" data-symbol="●">● DOT – Polkadot</option>
+        <option value="LINK" data-name="Chainlink" data-symbol="⬡">⬡ LINK – Chainlink</option>
+      </optgroup>
+      <optgroup label="── DeFi / Layer 2 ──">
+        <option value="MATIC" data-name="Polygon" data-symbol="⬟">⬟ MATIC – Polygon</option>
+        <option value="UNI" data-name="Uniswap" data-symbol="🦄">🦄 UNI – Uniswap</option>
+        <option value="ATOM" data-name="Cosmos" data-symbol="⚛">⚛ ATOM – Cosmos</option>
+        <option value="LTC" data-name="Litecoin" data-symbol="Ł">Ł LTC – Litecoin</option>
+        <option value="NEAR" data-name="NEAR Protocol" data-symbol="Ⓝ">Ⓝ NEAR – NEAR Protocol</option>
+        <option value="ARB" data-name="Arbitrum" data-symbol="▲">▲ ARB – Arbitrum</option>
+        <option value="OP" data-name="Optimism" data-symbol="🔴">🔴 OP – Optimism</option>
+        <option value="SUI" data-name="Sui" data-symbol="◆">◆ SUI – Sui</option>
+      </optgroup>
+      <optgroup label="── Meme Coins ──">
+        <option value="SHIB" data-name="Shiba Inu" data-symbol="🐕">🐕 SHIB – Shiba Inu</option>
+        <option value="PEPE" data-name="Pepe" data-symbol="🐸">🐸 PEPE – Pepe Coin</option>
+        <option value="FLOKI" data-name="Floki" data-symbol="🐶">🐶 FLOKI – Floki Inu</option>
+      </optgroup>
+    </select>
+    <span class="select-arrow">▼</span>
+  </div>
+
+  <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">
+    ⚡ ANALYSE STARTEN
+  </button>
+
+  <div class="coin-chips">
+    <div class="chip active" onclick="quickSelect('XRP')">XRP</div>
+    <div class="chip" onclick="quickSelect('BTC')">BTC</div>
+    <div class="chip" onclick="quickSelect('ETH')">ETH</div>
+    <div class="chip" onclick="quickSelect('SOL')">SOL</div>
+    <div class="chip" onclick="quickSelect('DOGE')">DOGE</div>
+    <div class="chip" onclick="quickSelect('BNB')">BNB</div>
+  </div>
+</div>
+
+<!-- TICKER -->
+
+<div class="ticker-wrap">
+  <div class="ticker-content" id="tickerContent">
+    <span class="ticker-item"><span class="tk-sym">BTC</span> <span>$97,420</span> <span class="tk-down">▼ -0.8%</span></span>
+    <span class="ticker-item"><span class="tk-sym">ETH</span> <span>$2,680</span> <span class="tk-up">▲ +1.2%</span></span>
+    <span class="ticker-item"><span class="tk-sym">XRP</span> <span>$1.46</span> <span class="tk-up">▲ +4.4%</span></span>
+    <span class="ticker-item"><span class="tk-sym">SOL</span> <span>$172.40</span> <span class="tk-up">▲ +2.1%</span></span>
+    <span class="ticker-item"><span class="tk-sym">BNB</span> <span>$618</span> <span class="tk-down">▼ -0.3%</span></span>
+    <span class="ticker-item"><span class="tk-sym">ADA</span> <span>$0.784</span> <span class="tk-up">▲ +3.1%</span></span>
+    <span class="ticker-item"><span class="tk-sym">DOGE</span> <span>$0.241</span> <span class="tk-down">▼ -1.4%</span></span>
+    <span class="ticker-item"><span class="tk-sym">FEAR & GREED</span> <span class="tk-down">32 – ANGST</span></span>
+    <span class="ticker-item"><span class="tk-sym">MARKTCAP GESAMT</span> <span>$3.28 Bio</span></span>
+    <!-- repeat -->
+    <span class="ticker-item"><span class="tk-sym">BTC</span> <span>$97,420</span> <span class="tk-down">▼ -0.8%</span></span>
+    <span class="ticker-item"><span class="tk-sym">ETH</span> <span>$2,680</span> <span class="tk-up">▲ +1.2%</span></span>
+    <span class="ticker-item"><span class="tk-sym">XRP</span> <span>$1.46</span> <span class="tk-up">▲ +4.4%</span></span>
+    <span class="ticker-item"><span class="tk-sym">SOL</span> <span>$172.40</span> <span class="tk-up">▲ +2.1%</span></span>
+    <span class="ticker-item"><span class="tk-sym">BNB</span> <span>$618</span> <span class="tk-down">▼ -0.3%</span></span>
+    <span class="ticker-item"><span class="tk-sym">FEAR & GREED</span> <span class="tk-down">32 – ANGST</span></span>
+    <span class="ticker-item"><span class="tk-sym">MARKTCAP GESAMT</span> <span>$3.28 Bio</span></span>
+  </div>
+</div>
+
+<div class="container" id="dashboardContent">
+
+  <!-- PRICE HERO -->
+
+  <div class="price-hero" style="margin-top:24px;" id="priceHero">
+    <div class="current-price">
+      <div class="price-label">AKTUELLER KURS</div>
+      <div class="price-value" id="priceValue">$1.46</div>
+      <div class="price-change up" id="priceChange">▲ +4.40% (24H)</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-label">24H HOCH</div><div class="stat-val" id="stat24hH">$1.51</div></div>
+      <div class="stat-box"><div class="stat-label">24H TIEF</div><div class="stat-val" id="stat24hL">$1.38</div></div>
+      <div class="stat-box"><div class="stat-label">7D PERF.</div><div class="stat-val" id="stat7d" style="color:var(--green)">+0.02%</div></div>
+      <div class="stat-box"><div class="stat-label">30D PERF.</div><div class="stat-val" id="stat30d" style="color:var(--red)">−31.3%</div></div>
+    </div>
+    <div class="signal-box neutral" id="signalBox">
+      <div class="signal-label">DAYTRADER SIGNAL</div>
+      <div class="signal-value" id="signalValue">HALTEN</div>
+      <div class="signal-sub" id="signalSub">Vorsichtiges Abwarten</div>
+      <div class="signal-confidence" id="signalConf">⚡ Konfidenz: 65% · NEUTRAL</div>
+    </div>
+    <div class="price-hero-bg" id="heroBg">XRP</div>
+  </div>
+
+  <!-- KI ANALYSE BOX -->
+
+  <div class="ai-analysis" id="aiAnalysisBox">
+    <div class="ai-header">
+      <span class="ai-tag">KI</span>
+      <span class="ai-title">XRP / RIPPLE – DAYTRADER ANALYSE · 15. FEB 2026</span>
+    </div>
+    <div class="ai-body" id="aiBody">XRP befindet sich nach einem Rückgang von 31% in 30 Tagen in einer kritischen Erholungsphase. Der RSI bei 34.77 signalisiert überverkaufte Bedingungen, während das Volumen von $2.48 Mrd auf erhöhtes Interesse hindeutet.
+
+📍 KURZFRISTIG (1–2 Tage): Die Zone $1.50–$1.52 ist der entscheidende Widerstand. Nur ein klarer Ausbruch darüber mit Volumenanstieg rechtfertigt Long-Positionen.
+
+📍 MITTELFRISTIG (3–7 Tage): Das wahrscheinlichste Szenario ist Konsolidierung zwischen $1.40 und $1.55. Bitcoin (aktuell ~$97.420) bestimmt die Richtung – bleibt BTC unter $100.000, bleibt XRP unter Druck.
+
+⚡ DAYTRADER EMPFEHLUNG: HALTEN / bedingt KAUFEN bei Ausbruch über $1.52.</div>
+
+  </div>
+
+  <!-- MAIN GRID -->
+
+  <div class="main-grid">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" id="indTitle">Technische Indikatoren · XRP</span>
+        <span class="card-badge badge-live">LIVE</span>
+      </div>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 600 120" xmlns="http://www.w3.org/2000/svg" id="miniChart">
+          <defs>
+            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line x1="0" y1="95" x2="600" y2="95" stroke="#00ff88" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+          <line x1="0" y1="30" x2="600" y2="30" stroke="#ff3a3a" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+          <path id="chartArea" d="M0,60 C30,65 60,80 100,85 C140,90 170,95 200,88 C230,80 260,70 290,65 C320,60 350,50 380,45 C410,40 440,55 470,62 C500,68 530,58 560,50 L560,120 L0,120 Z" fill="url(#chartGrad)" opacity="0.6"/>
+          <path id="chartLine" d="M0,60 C30,65 60,80 100,85 C140,90 170,95 200,88 C230,80 260,70 290,65 C320,60 350,50 380,45 C410,40 440,55 470,62 C500,68 530,58 560,50" fill="none" stroke="#00d4ff" stroke-width="2.5"/>
+          <circle id="chartDot" cx="560" cy="50" r="5" fill="#00d4ff"/>
+          <circle cx="560" cy="50" r="10" fill="none" stroke="#00d4ff" opacity="0.3">
+            <animate attributeName="r" values="5;14;5" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <text id="chartSupText" x="2" y="112" font-family="Share Tech Mono" font-size="9" fill="#00ff88" opacity="0.7">SUPPORT</text>
+          <text id="chartResText" x="2" y="28" font-family="Share Tech Mono" font-size="9" fill="#ff3a3a" opacity="0.7">WIDERSTAND</text>
+          <text id="chartPriceText" x="565" y="48" font-family="Share Tech Mono" font-size="9" fill="#00d4ff">$1.46</text>
+        </svg>
+        <div class="chart-labels"><span id="cl1">09.Feb</span><span id="cl2">11.Feb</span><span id="cl3">13.Feb</span><span>Heute</span></div>
+      </div>
+      <div id="indicatorsTable">
+        <div class="indicator-row"><span class="ind-name">RSI (14)</span><span class="ind-val" style="color:var(--yellow)">34.77</span><span class="ind-signal sig-neutral">NEUTRAL</span></div>
+        <div class="indicator-row"><span class="ind-name">MACD (12,26)</span><span class="ind-val" style="color:var(--red)">−0.155</span><span class="ind-signal sig-sell">BÄRISCH</span></div>
+        <div class="indicator-row"><span class="ind-name">Williams %R</span><span class="ind-val" style="color:var(--green)">−89.11</span><span class="ind-signal sig-buy">ÜBERVERKAUFT</span></div>
+        <div class="indicator-row"><span class="ind-name">MA 5 (SMA)</span><span class="ind-val" style="color:var(--red)">$1.73</span><span class="ind-signal sig-sell">SELL</span></div>
+        <div class="indicator-row"><span class="ind-name">MA 50 (SMA)</span><span class="ind-val" style="color:var(--red)">$1.95</span><span class="ind-signal sig-sell">SELL</span></div>
+        <div class="indicator-row"><span class="ind-name">Bollinger Bands</span><span class="ind-val" style="color:var(--yellow)">0.1745</span><span class="ind-signal sig-neutral">UNTEN</span></div>
+        <div class="indicator-row"><span class="ind-name">Volumen (24H)</span><span class="ind-val" style="color:var(--accent)">$2.48 Mrd</span><span class="ind-signal sig-neutral">NORMAL</span></div>
+      </div>
+    </div>
+
+```
+<div style="display:flex;flex-direction:column;gap:20px;">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Kurszonen</span><span class="card-badge badge-day">DAYTRADING</span></div>
+    <div id="levelsTable">
+      <div class="level-row"><span class="level-label">Widerstand 2</span><span class="level-price" style="color:var(--red)">$1.77</span><span class="level-type res">RES</span></div>
+      <div class="level-row"><span class="level-label">Widerstand 1</span><span class="level-price" style="color:var(--red)">$1.50</span><span class="level-type res">RES</span></div>
+      <div class="level-row"><span class="level-label">AKTUELL ▶</span><span class="level-price" style="color:var(--accent)">$1.46</span><span class="level-type cur">LIVE</span></div>
+      <div class="level-row"><span class="level-label">Support 1</span><span class="level-price" style="color:var(--green)">$1.35</span><span class="level-type sup">SUP</span></div>
+      <div class="level-row"><span class="level-label">Support 2</span><span class="level-price" style="color:var(--green)">$1.15</span><span class="level-type sup">SUP</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Risiko-Level</span><span class="card-badge badge-7d">7 TAGE</span></div>
+    <div class="risk-circles" id="riskCircles">
+      <div class="risk-circle rc-filled-red">!</div>
+      <div class="risk-circle rc-filled-red">!</div>
+      <div class="risk-circle rc-filled-red">!</div>
+      <div class="risk-circle rc-filled-yellow">~</div>
+      <div class="risk-circle rc-empty">·</div>
+    </div>
+    <div class="risk-label" id="riskLabel">HOCH (3/5) · VORSICHT BEI HEBEL</div>
+    <div style="margin-top:14px;font-size:13px;color:var(--text);line-height:1.6;" id="riskText">
+      XRP in <strong style="color:var(--yellow)">Hochrisiko-Zone</strong> mit starker BTC-Korrelation. Stop-Losses sind Pflicht.
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- BOTTOM GRID -->
+
+  <div class="bottom-grid">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Szenarien 7 Tage</span><span class="card-badge badge-7d">PROGNOSE</span></div>
+      <div class="scenario-row">
+        <span class="scenario-label" style="color:var(--yellow)">➡ NEUTRAL</span>
+        <div class="scenario-bar-bg"><div class="scenario-bar-fill sc-neutral" id="scNeutral" style="width:45%"></div></div>
+        <span class="scenario-pct" style="color:var(--yellow)" id="scNeutralPct">45%</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;font-family:'Share Tech Mono',monospace;" id="scNeutralText">$1.40–$1.55 · Konsolidierung</div>
+      <div class="scenario-row">
+        <span class="scenario-label" style="color:var(--green)">🐂 BULLISCH</span>
+        <div class="scenario-bar-bg"><div class="scenario-bar-fill sc-bull" id="scBull" style="width:35%"></div></div>
+        <span class="scenario-pct" style="color:var(--green)" id="scBullPct">35%</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;font-family:'Share Tech Mono',monospace;" id="scBullText">$1.55–$1.77 · Ausbruch nötig</div>
+      <div class="scenario-row">
+        <span class="scenario-label" style="color:var(--red)">🐻 BÄRISCH</span>
+        <div class="scenario-bar-bg"><div class="scenario-bar-fill sc-bear" id="scBear" style="width:20%"></div></div>
+        <span class="scenario-pct" style="color:var(--red)" id="scBearPct">20%</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;" id="scBearText">$1.15–$1.35 · BTC-Korrelation</div>
+    </div>
+
+```
+<div class="card">
+  <div class="card-header"><span class="card-title">Markt-Sentiment</span><span class="card-badge badge-live">LIVE</span></div>
+  <div style="margin-bottom:6px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);">ANGST / GIER INDEX</div>
+  <div style="height:20px;background:linear-gradient(90deg,#ff3a3a,#ffd700,#00ff88);border-radius:10px;position:relative;margin-bottom:8px;">
+    <div class="sentiment-needle" id="fearNeedle" style="left:32%"></div>
+  </div>
+  <div class="sentiment-labels"><span>EXTREME ANGST</span><span>NEUTRAL</span><span>GIER</span></div>
+  <div style="text-align:center;margin:14px 0;">
+    <span style="font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--orange);" id="fearScore">32</span>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--orange);margin-left:8px;" id="fearLabel">ANGST</span>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:14px;" id="sentimentRows">
+    <div class="indicator-row"><span class="ind-name">News-Sentiment</span><span class="ind-val" style="color:var(--green)">90/100</span><span class="ind-signal sig-buy">POSITIV</span></div>
+    <div class="indicator-row"><span class="ind-name">ETF-Zuflüsse</span><span class="ind-val" style="color:var(--green)">Bullisch</span><span class="ind-signal sig-buy">BULLISCH</span></div>
+    <div class="indicator-row"><span class="ind-name">Exchange-Reserven</span><span class="ind-val" style="color:var(--green)">↓ Fallend</span><span class="ind-signal sig-buy">AKKUM.</span></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-title">Daytrader Playbook</span><span class="card-badge badge-day">HEUTE</span></div>
+  <div id="playbookContent">
+    <div class="tip-row"><span class="tip-icon">🎯</span><span class="tip-text"><strong>Einstieg Long:</strong> Nur bei Ausbruch über <strong>$1.50–$1.52</strong> mit Volumen bestätigt.</span></div>
+    <div class="tip-row"><span class="tip-icon">🛑</span><span class="tip-text"><strong>Stop-Loss:</strong> Unter <strong>$1.38</strong>. Kein Trade ohne Stop.</span></div>
+    <div class="tip-row"><span class="tip-icon">📈</span><span class="tip-text"><strong>Take Profit:</strong> Ziel 1: <strong>$1.55</strong> · Ziel 2: <strong>$1.65–$1.70</strong></span></div>
+    <div class="tip-row"><span class="tip-icon">👀</span><span class="tip-text"><strong>BTC Watch:</strong> BTC über <strong>$100.000</strong> wäre sehr positiv für XRP.</span></div>
+    <div class="tip-row"><span class="tip-icon">⚡</span><span class="tip-text"><strong>Kein Hebel:</strong> RSI 34 + MACD-Schwäche = kein Leverage. Zu riskant.</span></div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <footer>
+    <div class="disclaimer">⚠️ KEIN FINANZRAT · NUR INFORMATIONSZWECKE · KRYPTOMÄRKTE SIND HOCHVOLATIL · INVESTIERE NUR WAS DU VERLIEREN KANNST</div>
+    <div class="footer-brand" id="footerBrand">CRYPTO SIGNAL DASHBOARD · FEB 2026</div>
+  </footer>
+</div>
+
+<script>
+const COIN_DATA = {
+  BTC:  { name:'Bitcoin',       price:'$97,420',  change:'-0.8',  h24:'$99,100',  l24:'$95,800',  p7d:'-3.2',  p30d:'-18.5', rsi:'52.3', signal:'neutral', conf:'60', risk:2, fear:32, sup1:'$90,000',sup2:'$82,000',res1:'$100,000',res2:'$108,000',cur:'$97,420',scN:50,scB:35,scBr:15 },
+  ETH:  { name:'Ethereum',      price:'$2,680',   change:'+1.2',  h24:'$2,720',   l24:'$2,590',   p7d:'+2.1',  p30d:'-22.1', rsi:'41.5', signal:'neutral', conf:'58', risk:3, fear:32, sup1:'$2,500',sup2:'$2,200',res1:'$2,800',res2:'$3,200',cur:'$2,680',scN:45,scB:30,scBr:25 },
+  XRP:  { name:'XRP / Ripple',  price:'$1.46',    change:'+4.4',  h24:'$1.51',    l24:'$1.38',    p7d:'+0.02', p30d:'-31.3', rsi:'34.8', signal:'neutral', conf:'65', risk:3, fear:32, sup1:'$1.35',sup2:'$1.15',res1:'$1.50',res2:'$1.77',cur:'$1.46',scN:45,scB:35,scBr:20 },
+  BNB:  { name:'BNB',           price:'$618',     change:'-0.3',  h24:'$628',     l24:'$610',     p7d:'-1.4',  p30d:'-12.0', rsi:'48.2', signal:'neutral', conf:'55', risk:2, fear:35, sup1:'$595',sup2:'$560',res1:'$640',res2:'$680',cur:'$618',scN:50,scB:30,scBr:20 },
+  SOL:  { name:'Solana',        price:'$172',     change:'+2.1',  h24:'$178',     l24:'$166',     p7d:'+5.3',  p30d:'-28.4', rsi:'38.6', signal:'buy',     conf:'62', risk:4, fear:30, sup1:'$155',sup2:'$140',res1:'$185',res2:'$210',cur:'$172',scN:35,scB:45,scBr:20 },
+  ADA:  { name:'Cardano',       price:'$0.784',   change:'+3.1',  h24:'$0.810',   l24:'$0.752',   p7d:'+1.8',  p30d:'-35.2', rsi:'31.4', signal:'buy',     conf:'60', risk:4, fear:28, sup1:'$0.720',sup2:'$0.660',res1:'$0.850',res2:'$0.950',cur:'$0.784',scN:35,scB:40,scBr:25 },
+  AVAX: { name:'Avalanche',     price:'$24.80',   change:'-1.2',  h24:'$25.90',   l24:'$24.10',   p7d:'-4.3',  p30d:'-41.0', rsi:'28.9', signal:'buy',     conf:'58', risk:4, fear:26, sup1:'$22.50',sup2:'$19.00',res1:'$28.00',res2:'$34.00',cur:'$24.80',scN:30,scB:42,scBr:28 },
+  DOGE: { name:'Dogecoin',      price:'$0.241',   change:'-1.4',  h24:'$0.252',   l24:'$0.235',   p7d:'-5.1',  p30d:'-44.0', rsi:'29.3', signal:'neutral', conf:'50', risk:5, fear:25, sup1:'$0.220',sup2:'$0.190',res1:'$0.260',res2:'$0.310',cur:'$0.241',scN:40,scB:30,scBr:30 },
+  DOT:  { name:'Polkadot',      price:'$4.82',    change:'+0.6',  h24:'$4.95',    l24:'$4.71',    p7d:'-2.8',  p30d:'-38.0', rsi:'33.1', signal:'neutral', conf:'52', risk:4, fear:30, sup1:'$4.40',sup2:'$3.90',res1:'$5.20',res2:'$6.00',cur:'$4.82',scN:45,scB:30,scBr:25 },
+  LINK: { name:'Chainlink',     price:'$13.40',   change:'+1.8',  h24:'$13.80',   l24:'$13.00',   p7d:'-1.2',  p30d:'-29.0', rsi:'37.5', signal:'neutral', conf:'57', risk:3, fear:31, sup1:'$12.50',sup2:'$11.00',res1:'$14.50',res2:'$17.00',cur:'$13.40',scN:45,scB:35,scBr:20 },
+  MATIC:{ name:'Polygon',       price:'$0.198',   change:'+2.3',  h24:'$0.205',   l24:'$0.191',   p7d:'-3.5',  p30d:'-46.0', rsi:'27.8', signal:'buy',     conf:'55', risk:5, fear:24, sup1:'$0.180',sup2:'$0.155',res1:'$0.225',res2:'$0.270',cur:'$0.198',scN:30,scB:40,scBr:30 },
+  UNI:  { name:'Uniswap',       price:'$7.45',    change:'+0.9',  h24:'$7.68',    l24:'$7.22',    p7d:'-4.0',  p30d:'-33.0', rsi:'34.2', signal:'neutral', conf:'53', risk:4, fear:29, sup1:'$6.80',sup2:'$5.90',res1:'$8.20',res2:'$9.50',cur:'$7.45',scN:42,scB:33,scBr:25 },
+  ATOM: { name:'Cosmos',        price:'$4.12',    change:'-0.5',  h24:'$4.28',    l24:'$4.02',    p7d:'-6.2',  p30d:'-39.0', rsi:'30.7', signal:'neutral', conf:'50', risk:4, fear:28, sup1:'$3.80',sup2:'$3.40',res1:'$4.50',res2:'$5.20',cur:'$4.12',scN:43,scB:32,scBr:25 },
+  LTC:  { name:'Litecoin',      price:'$86.20',   change:'+1.1',  h24:'$88.50',   l24:'$84.10',   p7d:'-2.0',  p30d:'-25.0', rsi:'40.1', signal:'neutral', conf:'55', risk:3, fear:32, sup1:'$80.00',sup2:'$72.00',res1:'$92.00',res2:'$102.00',cur:'$86.20',scN:48,scB:32,scBr:20 },
+  NEAR: { name:'NEAR Protocol', price:'$2.84',    change:'+2.8',  h24:'$2.95',    l24:'$2.72',    p7d:'-5.5',  p30d:'-42.0', rsi:'29.5', signal:'buy',     conf:'56', risk:5, fear:26, sup1:'$2.55',sup2:'$2.20',res1:'$3.20',res2:'$3.80',cur:'$2.84',scN:33,scB:40,scBr:27 },
+  ARB:  { name:'Arbitrum',      price:'$0.362',   change:'+1.5',  h24:'$0.375',   l24:'$0.350',   p7d:'-7.1',  p30d:'-48.0', rsi:'26.4', signal:'buy',     conf:'54', risk:5, fear:24, sup1:'$0.330',sup2:'$0.290',res1:'$0.400',res2:'$0.460',cur:'$0.362',scN:30,scB:42,scBr:28 },
+  OP:   { name:'Optimism',      price:'$0.724',   change:'+3.2',  h24:'$0.748',   l24:'$0.695',   p7d:'-6.8',  p30d:'-50.0', rsi:'25.9', signal:'buy',     conf:'53', risk:5, fear:23, sup1:'$0.660',sup2:'$0.580',res1:'$0.810',res2:'$0.940',cur:'$0.724',scN:28,scB:44,scBr:28 },
+  SUI:  { name:'Sui',           price:'$2.14',    change:'+4.5',  h24:'$2.22',    l24:'$2.03',    p7d:'+1.2',  p30d:'-36.0', rsi:'36.8', signal:'neutral', conf:'58', risk:4, fear:30, sup1:'$1.90',sup2:'$1.65',res1:'$2.40',res2:'$2.80',cur:'$2.14',scN:38,scB:40,scBr:22 },
+  SHIB: { name:'Shiba Inu',     price:'$0.0000122',change:'-2.1', h24:'$0.0000130',l24:'$0.0000118',p7d:'-8.3',p30d:'-52.0', rsi:'24.1', signal:'neutral', conf:'40', risk:5, fear:22, sup1:'$0.0000110',sup2:'$0.0000095',res1:'$0.0000140',res2:'$0.0000175',cur:'$0.0000122',scN:35,scB:28,scBr:37 },
+  PEPE: { name:'Pepe Coin',     price:'$0.00000812',change:'-3.4',h24:'$0.00000870',l24:'$0.00000785',p7d:'-11.2',p30d:'-58.0',rsi:'21.7',signal:'sell',   conf:'45', risk:5, fear:20, sup1:'$0.0000075',sup2:'$0.0000060',res1:'$0.0000095',res2:'$0.0000120',cur:'$0.00000812',scN:28,scB:22,scBr:50 },
+  FLOKI:{ name:'Floki Inu',     price:'$0.0000648',change:'-1.8', h24:'$0.0000672',l24:'$0.0000631',p7d:'-9.0',p30d:'-55.0', rsi:'23.3', signal:'neutral', conf:'38', risk:5, fear:21, sup1:'$0.0000600',sup2:'$0.0000520',res1:'$0.0000720',res2:'$0.0000880',cur:'$0.0000648',scN:32,scB:24,scBr:44 },
+};
+
+const SIGNAL_LABELS = {
+  buy:     { text:'KAUFEN',  sub:'Bullisches Setup erkannt',  cls:'buy' },
+  sell:    { text:'VERKAUFEN',sub:'Bärisches Signal aktiv', cls:'sell' },
+  neutral: { text:'HALTEN',  sub:'Abwarten empfohlen',        cls:'neutral' },
+};
+
+let currentCoin = 'XRP';
+
+function quickSelect(sym) {
+  document.getElementById('coinSelect').value = sym;
+  document.querySelectorAll('.chip').forEach(c => {
+    c.classList.toggle('active', c.textContent === sym);
+  });
+  runAnalysis();
+}
+
+document.getElementById('coinSelect').addEventListener('change', function() {
+  const sym = this.value;
+  document.querySelectorAll('.chip').forEach(c => {
+    c.classList.toggle('active', c.textContent === sym);
+  });
+});
+
+async function runAnalysis() {
+  const sym = document.getElementById('coinSelect').value;
+  currentCoin = sym;
+  const d = COIN_DATA[sym];
+  if (!d) return;
+
+  const btn = document.getElementById('analyzeBtn');
+  const overlay = document.getElementById('loadingOverlay');
+  const sub = document.getElementById('loadingSub');
+  btn.disabled = true;
+  overlay.classList.add('active');
+  sub.textContent = `${d.name} (${sym}) wird analysiert...`;
+
+  // Update static parts immediately
+  updateStaticUI(sym, d);
+
+  // Get AI analysis
+  try {
+    sub.textContent = 'Claude KI generiert Analyse...';
+    const analysis = await getAIAnalysis(sym, d);
+    document.getElementById('aiBody').textContent = analysis;
+    document.getElementById('aiAnalysisBox').querySelector('.ai-title').textContent =
+      `${d.name.toUpperCase()} (${sym}) – DAYTRADER ANALYSE · 15. FEB 2026`;
+  } catch(e) {
+    document.getElementById('aiBody').textContent =
+      `Analyse für ${d.name} (${sym}):\n\nAktueller Kurs: ${d.price} (${d.change > 0 ? '+':''}${d.change}%)\n\nSignal: ${SIGNAL_LABELS[d.signal].text} – Konfidenz ${d.conf}%\n\nRSI: ${d.rsi} | Support: ${d.sup1} | Widerstand: ${d.res1}\n\nBitte prüfe die technischen Daten im Dashboard für Details.`;
+  }
+
+  overlay.classList.remove('active');
+  btn.disabled = false;
+}
+
+function updateStaticUI(sym, d) {
+  // Logo & title
+  const select = document.getElementById('coinSelect');
+  const opt = select.options[select.selectedIndex];
+  document.getElementById('logoIcon').textContent = opt.dataset.symbol || sym.slice(0,3);
+  document.getElementById('dashTitle').textContent = sym + ' SIGNAL';
+  document.getElementById('heroBg').textContent = sym;
+  document.getElementById('footerBrand').textContent = sym + ' SIGNAL DASHBOARD · FEB 2026';
+  document.getElementById('indTitle').textContent = `Technische Indikatoren · ${sym}`;
+
+  // Price hero
+  document.getElementById('priceValue').textContent = d.price;
+  const chg = parseFloat(d.change);
+  const chgEl = document.getElementById('priceChange');
+  chgEl.textContent = `${chg >= 0 ? '▲ +' : '▼ '}${d.change}% (24H)`;
+  chgEl.className = 'price-change ' + (chg >= 0 ? 'up' : 'down');
+  document.getElementById('stat24hH').textContent = d.h24;
+  document.getElementById('stat24hL').textContent = d.l24;
+  const p7El = document.getElementById('stat7d');
+  p7El.textContent = (parseFloat(d.p7d) >= 0 ? '+' : '') + d.p7d + '%';
+  p7El.style.color = parseFloat(d.p7d) >= 0 ? 'var(--green)' : 'var(--red)';
+  const p30El = document.getElementById('stat30d');
+  p30El.textContent = (parseFloat(d.p30d) >= 0 ? '+' : '') + d.p30d + '%';
+  p30El.style.color = parseFloat(d.p30d) >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // Signal
+  const sig = SIGNAL_LABELS[d.signal];
+  const box = document.getElementById('signalBox');
+  box.className = 'signal-box ' + sig.cls;
+  document.getElementById('signalValue').textContent = sig.text;
+  document.getElementById('signalSub').textContent = sig.sub;
+  document.getElementById('signalConf').textContent = `⚡ Konfidenz: ${d.conf}% · ${d.signal.toUpperCase()}`;
+
+  // Levels
+  document.getElementById('levelsTable').innerHTML = `
+    <div class="level-row"><span class="level-label">Widerstand 2</span><span class="level-price" style="color:var(--red)">${d.res2}</span><span class="level-type res">RES</span></div>
+    <div class="level-row"><span class="level-label">Widerstand 1</span><span class="level-price" style="color:var(--red)">${d.res1}</span><span class="level-type res">RES</span></div>
+    <div class="level-row"><span class="level-label">AKTUELL ▶</span><span class="level-price" style="color:var(--accent)">${d.cur}</span><span class="level-type cur">LIVE</span></div>
+    <div class="level-row"><span class="level-label">Support 1</span><span class="level-price" style="color:var(--green)">${d.sup1}</span><span class="level-type sup">SUP</span></div>
+    <div class="level-row"><span class="level-label">Support 2</span><span class="level-price" style="color:var(--green)">${d.sup2}</span><span class="level-type sup">SUP</span></div>
+  `;
+
+  // Scenarios
+  const animate = (id, pct) => {
+    const el = document.getElementById(id);
+    el.style.width = '0%';
+    setTimeout(() => { el.style.width = pct + '%'; }, 100);
+  };
+  animate('scNeutral', d.scN); document.getElementById('scNeutralPct').textContent = d.scN + '%';
+  animate('scBull', d.scB);    document.getElementById('scBullPct').textContent = d.scB + '%';
+  animate('scBear', d.scBr);   document.getElementById('scBearPct').textContent = d.scBr + '%';
+
+  // Risk circles
+  const riskMap = ['rc-empty','rc-filled-yellow','rc-filled-red'];
+  const riskConfig = [
+    [1,1,0,0,0],[1,1,0,0,0],[1,1,1,0,0],[1,1,1,1,0],[1,1,1,1,1]
+  ];
+  const rc = riskConfig[d.risk - 1];
+  const circleSymbols = ['!','!','!','~','·'];
+  document.getElementById('riskCircles').innerHTML = rc.map((v,i) =>
+    `<div class="risk-circle ${v ? (i < 3 ? 'rc-filled-red' : 'rc-filled-yellow') : 'rc-empty'}">${circleSymbols[i]}</div>`
+  ).join('');
+  const riskLabels = ['','SEHR NIEDRIG (1/5)','NIEDRIG (2/5)','HOCH (3/5)','SEHR HOCH (4/5)','EXTREM (5/5) · NUR EXPERTEN'];
+  document.getElementById('riskLabel').textContent = riskLabels[d.risk] + ' · STOP-LOSS PFLICHT';
+
+  // Fear
+  const fearPct = d.fear;
+  document.getElementById('fearNeedle').style.left = fearPct + '%';
+  document.getElementById('fearScore').textContent = fearPct;
+  document.getElementById('fearLabel').textContent = fearPct < 25 ? 'EXTREME ANGST' : fearPct < 45 ? 'ANGST' : fearPct < 55 ? 'NEUTRAL' : fearPct < 75 ? 'GIER' : 'EXTREME GIER';
+  document.getElementById('fearScore').style.color = fearPct < 40 ? 'var(--red)' : fearPct < 60 ? 'var(--yellow)' : 'var(--green)';
+
+  // Chart labels
+  const days = ['01.Feb','05.Feb','09.Feb','12.Feb','13.Feb','14.Feb'];
+  document.getElementById('cl1').textContent = days[Math.floor(Math.random()*2)];
+  document.getElementById('cl2').textContent = days[2];
+  document.getElementById('cl3').textContent = days[4];
+  document.getElementById('chartPriceText').textContent = d.price;
+  document.getElementById('chartSupText').textContent = `SUPPORT ${d.sup1}`;
+  document.getElementById('chartResText').textContent = `WIDERSTAND ${d.res1}`;
+}
+
+async function getAIAnalysis(sym, d) {
+  const prompt = `Du bist ein professioneller Krypto-Analyst mit Fokus auf Daytrading. Erstelle eine präzise, professionelle Kurzanalyse für ${d.name} (${sym}) auf Deutsch.
+
+Aktuelle Daten (15. Februar 2026):
+- Kurs: ${d.price}
+- 24H Änderung: ${d.change}%
+- 7-Tage Performance: ${d.p7d}%
+- 30-Tage Performance: ${d.p30d}%
+- RSI: ${d.rsi}
+- Support 1: ${d.sup1} | Support 2: ${d.sup2}
+- Widerstand 1: ${d.res1} | Widerstand 2: ${d.res2}
+- Signal: ${SIGNAL_LABELS[d.signal].text}
+- Risiko-Level: ${d.risk}/5
+- Fear & Greed Index: ${d.fear}
+
+Erstelle eine strukturierte Analyse mit:
+1. Kurzüberblick (2-3 Sätze zur aktuellen Lage)
+2. 📍 KURZFRISTIG (1-2 Tage): Was ist zu erwarten?
+3. 📍 MITTELFRISTIG (3-7 Tage): Hauptszenario?
+4. ⚡ DAYTRADER EMPFEHLUNG: Konkreter Rat mit Einstieg/Stop/Ziel
+
+Maximal 200 Wörter. Professionell, präzise, kein Finanzberat-Disclaimer nötig.`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) throw new Error('API error');
+  const data = await response.json();
+  return data.content.map(b => b.text || '').join('');
+}
+
+// Clock
+function updateTime() {
+  const now = new Date();
+  const d = now.toLocaleDateString('de-DE', { day:'2-digit', month:'long', year:'numeric' });
+  const t = now.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
+  document.getElementById('timestamp').textContent = `${d.toUpperCase()} · ${t} CET`;
+}
+updateTime();
+setInterval(updateTime, 60000);
+
+// Trigger initial analysis on load
+window.addEventListener('load', () => runAnalysis());
+</script>
+
+</body>
+</html>
