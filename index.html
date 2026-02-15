@@ -1056,24 +1056,117 @@ const COINGECKO_IDS = {
   OP:'optimism', SUI:'sui', SHIB:'shiba-inu', PEPE:'pepe', FLOKI:'floki',
 };
 
-// Live-Preis von CoinGecko holen
+// Live-Preis + 7d/30d Performance + Marktdaten von CoinGecko
 async function fetchLivePrice(sym) {
   const id = COINGECKO_IDS[sym];
   if (!id) return null;
   try {
-    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_high_low_24h=true`;
+    const url = `https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=true`;
     const res = await fetch(url);
     if (!res.ok) return null;
     const json = await res.json();
-    const data = json[id];
-    if (!data) return null;
+    const m = json.market_data;
     return {
-      price: data.usd,
-      change24h: data.usd_24h_change,
-      high24h: data.usd_24h_high,
-      low24h: data.usd_24h_low,
-      vol24h: data.usd_24h_vol,
+      price:       m.current_price.usd,
+      change24h:   m.price_change_percentage_24h,
+      change7d:    m.price_change_percentage_7d,
+      change30d:   m.price_change_percentage_30d,
+      high24h:     m.high_24h.usd,
+      low24h:      m.low_24h.usd,
+      vol24h:      m.total_volume.usd,
+      marketCap:   m.market_cap.usd,
+      sparkline:   json.market_data.sparkline_7d?.price || [],  // 7-Tage Stundenwerte
     };
+  } catch(e) { return null; }
+}
+
+// RSI aus Preisreihe berechnen (14 Perioden)
+function calcRSI(prices, period = 14) {
+  if (prices.length < period + 1) return null;
+  let gains = 0, losses = 0;
+  for (let i = 1; i <= period; i++) {
+    const diff = prices[i] - prices[i - 1];
+    if (diff >= 0) gains += diff; else losses -= diff;
+  }
+  let avgGain = gains / period;
+  let avgLoss = losses / period;
+  for (let i = period + 1; i < prices.length; i++) {
+    const diff = prices[i] - prices[i - 1];
+    avgGain = (avgGain * (period - 1) + Math.max(diff, 0)) / period;
+    avgLoss = (avgLoss * (period - 1) + Math.max(-diff, 0)) / period;
+  }
+  if (avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return parseFloat((100 - 100 / (1 + rs)).toFixed(2));
+}
+
+// Simple Moving Average
+function calcSMA(prices, period) {
+  if (prices.length < period) return null;
+  const slice = prices.slice(-period);
+  return slice.reduce((a, b) => a + b, 0) / period;
+}
+
+// MACD (12,26 EMA Differenz)
+function calcEMA(prices, period) {
+  if (prices.length < period) return null;
+  const k = 2 / (period + 1);
+  let ema = prices.slice(0, period).reduce((a, b) => a + b, 0) / period;
+  for (let i = period; i < prices.length; i++) {
+    ema = prices[i] * k + ema * (1 - k);
+  }
+  return ema;
+}
+
+function calcMACD(prices) {
+  const ema12 = calcEMA(prices, 12);
+  const ema26 = calcEMA(prices, 26);
+  if (!ema12 || !ema26) return null;
+  return parseFloat((ema12 - ema26).toFixed(6));
+}
+
+// Bollinger Band Breite
+function calcBB(prices, period = 20) {
+  if (prices.length < period) return null;
+  const slice = prices.slice(-period);
+  const mean = slice.reduce((a, b) => a + b, 0) / period;
+  const variance = slice.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / period;
+  const std = Math.sqrt(variance);
+  return parseFloat(((2 * std) / mean).toFixed(4));
+}
+
+// Williams %R
+function calcWilliams(prices, period = 14) {
+  if (prices.length < period) return null;
+  const slice = prices.slice(-period);
+  const highest = Math.max(...slice);
+  const lowest  = Math.min(...slice);
+  const current = prices[prices.length - 1];
+  if (highest === lowest) return -50;
+  return parseFloat((((highest - current) / (highest - lowest)) * -100).toFixed(2));
+}
+
+// Fear & Greed Index von Alternative.me
+async function fetchFearGreed() {
+  try {
+    const res = await fetch('https://api.alternative.me/fng/?limit=1');
+    if (!res.ok) return null;
+    const json = await res.json();
+    return {
+      value: parseInt(json.data[0].value),
+      label: json.data[0].value_classification,
+    };
+  } catch(e) { return null; }
+}
+
+// Ticker für ALLE sichtbaren Coins auf einmal von CoinGecko laden
+async function fetchAllTickerPrices() {
+  try {
+    const ids = Object.values(COINGECKO_IDS).join(',');
+    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return await res.json();
   } catch(e) { return null; }
 }
 
@@ -1093,6 +1186,13 @@ function fmtVol(v) {
   if (v >= 1e9) return '$' + (v/1e9).toFixed(2) + ' Mrd';
   if (v >= 1e6) return '$' + (v/1e6).toFixed(1) + ' Mio';
   return '$' + v.toFixed(0);
+}
+
+function fmtMarketCap(v) {
+  if (!v) return '–';
+  if (v >= 1e12) return '$' + (v/1e12).toFixed(2) + ' Bio';
+  if (v >= 1e9)  return '$' + (v/1e9).toFixed(1) + ' Mrd';
+  return '$' + (v/1e6).toFixed(0) + ' Mio';
 }
 
 function quickSelect(sym) {
@@ -1121,44 +1221,115 @@ async function runAnalysis() {
   const sub = document.getElementById('loadingSub');
   btn.disabled = true;
   overlay.classList.add('active');
-  sub.textContent = `Live-Kurs für ${d.name} (${sym}) wird geladen...`;
+  sub.textContent = `Live-Daten für ${d.name} (${sym}) werden geladen...`;
 
-  // 1. Live-Preis holen
-  const live = await fetchLivePrice(sym);
+  // 1. Live-Preisdaten + Sparkline (7d Stundenwerte) holen
+  const [live, fearGreed] = await Promise.all([
+    fetchLivePrice(sym),
+    fetchFearGreed(),
+  ]);
+
   if (live) {
-    // Echte Werte in COIN_DATA einpflegen
-    d.price  = fmtPrice(live.price);
-    d.cur    = fmtPrice(live.price);
-    d.change = live.change24h ? live.change24h.toFixed(2) : d.change;
-    d.h24    = fmtPrice(live.high24h);
-    d.l24    = fmtPrice(live.low24h);
-    d.vol    = fmtVol(live.vol24h);
-    // Support/Widerstand dynamisch aus Live-Preis ableiten
     const p = live.price;
-    d.sup1   = fmtPrice(p * 0.93);
-    d.sup2   = fmtPrice(p * 0.82);
-    d.res1   = fmtPrice(p * 1.05);
-    d.res2   = fmtPrice(p * 1.15);
-    d.cur    = fmtPrice(p);
-    d.entryLong = fmtPrice(p * 1.02) + '–' + fmtPrice(p * 1.04);
-    d.stop   = fmtPrice(p * 0.94);
-    d.tp1    = fmtPrice(p * 1.06);
-    d.tp2    = fmtPrice(p * 1.12) + '–' + fmtPrice(p * 1.18);
-    // Signal aus 24h-Change ableiten
-    const chg = live.change24h || 0;
-    d.signal = chg > 3 ? 'buy' : chg < -3 ? 'sell' : 'neutral';
-    sub.textContent = `✓ Live-Kurs: ${d.price} | KI analysiert...`;
+    const spark = live.sparkline || [];
+
+    // ── Kerndaten ──
+    d.price   = fmtPrice(p);
+    d.cur     = fmtPrice(p);
+    d.change  = live.change24h ? live.change24h.toFixed(2) : d.change;
+    d.h24     = fmtPrice(live.high24h);
+    d.l24     = fmtPrice(live.low24h);
+    d.vol     = fmtVol(live.vol24h);
+    d.p7d     = live.change7d  ? live.change7d.toFixed(2)  : d.p7d;
+    d.p30d    = live.change30d ? live.change30d.toFixed(2) : d.p30d;
+
+    // ── Technische Indikatoren aus Sparkline berechnen ──
+    if (spark.length >= 26) {
+      const rsi = calcRSI(spark, 14);
+      const macd = calcMACD(spark);
+      const ma5  = calcSMA(spark, Math.min(5, spark.length));
+      const ma50 = calcSMA(spark, Math.min(50, spark.length));
+      const bb   = calcBB(spark, Math.min(20, spark.length));
+      const will = calcWilliams(spark, Math.min(14, spark.length));
+
+      if (rsi !== null) {
+        d.rsi = rsi.toFixed(2);
+        d.rsiSig = rsi < 30 ? 'buy' : rsi > 70 ? 'sell' : 'neutral';
+      }
+      if (macd !== null) {
+        d.macd = macd.toFixed(6);
+        d.macdSig = macd > 0 ? 'buy' : 'sell';
+      }
+      if (ma5 !== null) {
+        d.ma5    = fmtPrice(ma5);
+        d.ma5sig = p > ma5 ? 'buy' : 'sell';
+      }
+      if (ma50 !== null) {
+        d.ma50    = fmtPrice(ma50);
+        d.ma50sig = p > ma50 ? 'buy' : 'sell';
+      }
+      if (bb !== null)   d.bb   = bb.toFixed(4);
+      if (will !== null) {
+        d.williams = will.toFixed(2);
+        d.willSig  = will < -80 ? 'buy' : will > -20 ? 'sell' : 'neutral';
+      }
+    }
+
+    // ── Support / Widerstand aus Sparkline-Hochs/Tiefs ──
+    if (spark.length > 10) {
+      const recentLow  = Math.min(...spark.slice(-Math.min(48, spark.length)));
+      const recentHigh = Math.max(...spark.slice(-Math.min(48, spark.length)));
+      d.sup1 = fmtPrice(recentLow * 0.99);
+      d.sup2 = fmtPrice(recentLow * 0.94);
+      d.res1 = fmtPrice(recentHigh * 1.01);
+      d.res2 = fmtPrice(recentHigh * 1.06);
+    } else {
+      d.sup1 = fmtPrice(p * 0.93);
+      d.sup2 = fmtPrice(p * 0.82);
+      d.res1 = fmtPrice(p * 1.05);
+      d.res2 = fmtPrice(p * 1.15);
+    }
+
+    // ── Trading-Levels ──
+    d.entryLong = fmtPrice(p * 1.01) + '–' + fmtPrice(p * 1.03);
+    d.stop      = fmtPrice(p * 0.94);
+    d.tp1       = fmtPrice(p * 1.05);
+    d.tp2       = fmtPrice(p * 1.10) + '–' + fmtPrice(p * 1.16);
+
+    // ── Signal aus RSI + 24h-Change ──
+    const chgNum = parseFloat(d.change);
+    const rsiNum = parseFloat(d.rsi);
+    if (chgNum > 4 || rsiNum < 30)       d.signal = 'buy';
+    else if (chgNum < -4 || rsiNum > 70) d.signal = 'sell';
+    else                                  d.signal = 'neutral';
+
+    // ── Volumen-Signal ──
+    d.volSig = 'normal';
+
+    sub.textContent = `✓ Live-Daten geladen | RSI: ${d.rsi} | KI analysiert...`;
   } else {
-    sub.textContent = `Kein Live-Kurs (Fallback) | KI analysiert ${d.name}...`;
+    sub.textContent = `Kein Live-Kurs verfügbar – Fallback-Daten | KI analysiert...`;
   }
 
-  // 2. UI sofort updaten
-  updateStaticUI(sym, d);
+  // ── Fear & Greed live updaten ──
+  if (fearGreed) {
+    d.fear = fearGreed.value;
+    const needle = document.getElementById('fearNeedle');
+    const scoreEl = document.getElementById('fearScore');
+    const labelEl = document.getElementById('fearLabel');
+    if (needle) needle.style.left = fearGreed.value + '%';
+    if (scoreEl) {
+      scoreEl.textContent = fearGreed.value;
+      scoreEl.style.color = fearGreed.value < 40 ? 'var(--red)' : fearGreed.value < 60 ? 'var(--yellow)' : 'var(--green)';
+    }
+    if (labelEl) labelEl.textContent = fearGreed.label.toUpperCase();
+  }
 
-  // 3. Ticker updaten
+  // 2. UI updaten
+  updateStaticUI(sym, d);
   updateTickerPrice(sym, d.price, d.change);
 
-  // 4. KI-Analyse holen
+  // 3. KI-Analyse
   try {
     sub.textContent = 'Claude KI generiert Analyse...';
     const now = new Date();
@@ -1173,32 +1344,42 @@ async function runAnalysis() {
     document.getElementById('aiTitle').textContent =
       `${d.name.toUpperCase()} (${sym}) – ANALYSE · ${dateStr.toUpperCase()}`;
     document.getElementById('aiBody').textContent =
-      `Analyse für ${d.name} (${sym}):\n\nAktueller Kurs: ${d.price} (${parseFloat(d.change) >= 0 ? '+':''}${d.change}%)\n\nSignal: ${SIGNAL_LABELS[d.signal].text} – Konfidenz ${d.conf}%\n\nRSI: ${d.rsi} | MACD: ${d.macd}\nSupport: ${d.sup1} / ${d.sup2}\nWiderstand: ${d.res1} / ${d.res2}\n\n📍 KURZFRISTIG: Beobachte Zone ${d.res1} als Schlüsselwiderstand.\n📍 MITTELFRISTIG: Support bei ${d.sup1} muss halten.\n⚡ EMPFEHLUNG: Einstieg bei ${d.entryLong} · Stop: ${d.stop} · TP: ${d.tp1}`;
+      `Analyse für ${d.name} (${sym}):\n\nAktueller Kurs: ${d.price} (${parseFloat(d.change) >= 0 ? '+':''}${d.change}%)\nRSI: ${d.rsi} | Signal: ${SIGNAL_LABELS[d.signal].text}\nSupport: ${d.sup1} | Widerstand: ${d.res1}\n\n⚡ EMPFEHLUNG: Einstieg ${d.entryLong} · Stop: ${d.stop} · TP: ${d.tp1}`;
   }
 
   overlay.classList.remove('active');
   btn.disabled = false;
 
-  // 5. Auto-Refresh alle 60 Sekunden
+  // 4. Auto-Refresh alle 60 Sek (nur Preis, kein KI-Reload)
   clearTimeout(window._priceRefreshTimer);
   window._priceRefreshTimer = setTimeout(async () => {
+    if (sym !== currentCoin) return;
     const fresh = await fetchLivePrice(sym);
-    if (fresh && sym === currentCoin) {
+    if (fresh) {
       COIN_DATA[sym].price  = fmtPrice(fresh.price);
       COIN_DATA[sym].change = fresh.change24h ? fresh.change24h.toFixed(2) : COIN_DATA[sym].change;
       COIN_DATA[sym].h24    = fmtPrice(fresh.high24h);
       COIN_DATA[sym].l24    = fmtPrice(fresh.low24h);
-      // Nur Preis-Elemente leise updaten (kein reload)
+      const chg = parseFloat(COIN_DATA[sym].change);
       document.getElementById('priceValue').textContent = COIN_DATA[sym].price;
-      const chg2 = parseFloat(COIN_DATA[sym].change);
-      const chgEl2 = document.getElementById('priceChange');
-      chgEl2.textContent = `${chg2 >= 0 ? '▲ +' : '▼ '}${COIN_DATA[sym].change}% (24H)`;
-      chgEl2.className = 'price-change ' + (chg2 >= 0 ? 'up' : 'down');
+      const ce = document.getElementById('priceChange');
+      ce.textContent = `${chg >= 0 ? '▲ +' : '▼ '}${COIN_DATA[sym].change}% (24H)`;
+      ce.className = 'price-change ' + (chg >= 0 ? 'up' : 'down');
       document.getElementById('chartLivePrice').textContent = COIN_DATA[sym].price;
-      const chgEl3 = document.getElementById('chartLiveChange');
-      chgEl3.textContent = (chg2 >= 0 ? '▲ +' : '▼ ') + COIN_DATA[sym].change + '%';
-      chgEl3.className = chg2 >= 0 ? 'up' : 'down';
+      const cl = document.getElementById('chartLiveChange');
+      cl.textContent = (chg >= 0 ? '▲ +' : '▼ ') + COIN_DATA[sym].change + '%';
+      cl.className = chg >= 0 ? 'up' : 'down';
       updateTickerPrice(sym, COIN_DATA[sym].price, COIN_DATA[sym].change);
+    }
+    // Fear & Greed auch refreshen
+    const fg = await fetchFearGreed();
+    if (fg) {
+      const n = document.getElementById('fearNeedle');
+      const s = document.getElementById('fearScore');
+      const l = document.getElementById('fearLabel');
+      if (n) n.style.left = fg.value + '%';
+      if (s) { s.textContent = fg.value; s.style.color = fg.value < 40 ? 'var(--red)' : fg.value < 60 ? 'var(--yellow)' : 'var(--green)'; }
+      if (l) l.textContent = fg.label.toUpperCase();
     }
   }, 60000);
 }
@@ -1857,6 +2038,18 @@ function doLogin() {
       // Show username in header
       document.getElementById('userBadge').innerHTML =
         `<span class="user-dot"></span>${user.toUpperCase()}`;
+      // Ticker sofort mit Live-Preisen befüllen
+      fetchAllTickerPrices().then(tickers => {
+        if (!tickers) return;
+        const symMap = Object.entries(COINGECKO_IDS);
+        symMap.forEach(([sym, id]) => {
+          const data = tickers[id];
+          if (!data) return;
+          const price = fmtPrice(data.usd);
+          const chg   = data.usd_24h_change ? data.usd_24h_change.toFixed(2) : null;
+          if (chg) updateTickerPrice(sym, price, chg);
+        });
+      });
       // Start analysis (which also draws chart via updateStaticUI)
       runAnalysis();
     }, 500);
