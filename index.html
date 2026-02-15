@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Signal Dashboard - KI-gestützt</title>
+<link rel="stylesheet" href="assets/css/variables.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/animations.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">◈</div>
+      <div class="login-title">CRYPTO SIGNAL</div>
+      <div class="login-sub">DAYTRADER DASHBOARD · SECURE ACCESS</div>
+    </div>
+    <div class="login-divider"></div>
+    
+    <div class="login-field">
+      <label class="login-label" for="loginUser">▸ Benutzername</label>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">👤</span>
+        <input class="login-input" type="text" id="loginUser" placeholder="Username" autocomplete="username" />
+      </div>
+    </div>
+
+    <div class="login-field">
+      <label class="login-label" for="loginPass">▸ Passwort</label>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">🔒</span>
+        <input class="login-input" type="password" id="loginPass" placeholder="Passwort" autocomplete="current-password" />
+      </div>
+    </div>
+
+    <button class="login-btn" id="loginBtn">⚡ EINLOGGEN</button>
+    <div class="login-error" id="loginError">✕ UNGÜLTIGE ZUGANGSDATEN</div>
+    
+    <div class="login-footer">
+      CRYPTO SIGNAL DASHBOARD · ZUGANG NUR FÜR AUTORISIERTE NUTZER
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard (hidden until login) -->
+<div id="dashboardWrapper" style="display:none;">
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">ANALYSE LÄUFT</div>
+    <div class="loading-sub" id="loadingSub">KI analysiert Marktdaten...</div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon" id="logoIcon">◈</div>
+        <div>
+          <h1 id="dashTitle">CRYPTO SIGNAL</h1>
+          <p>KI-Powered Daytrader Dashboard</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="user-badge" id="userBadge"><span class="user-dot"></span>ADMIN</div>
+        <div class="live-badge"><div class="live-dot"></div>KI ANALYSE</div>
+        <div class="timestamp" id="timestamp"></div>
+        <button class="logout-btn" id="logoutBtn">⏻ LOGOUT</button>
+      </div>
+    </header>
+  </div>
+
+  <!-- Selector Bar -->
+  <div class="selector-bar">
+    <span class="selector-label">COIN AUSWÄHLEN:</span>
+    <div class="coin-select-wrap">
+      <select class="coin-select" id="coinSelect">
+        <option value="BTC">₿ BTC – Bitcoin</option>
+        <option value="ETH">Ξ ETH – Ethereum</option>
+        <option value="XRP" selected>✕ XRP – Ripple</option>
+        <option value="SOL">◎ SOL – Solana</option>
+      </select>
+      <span class="select-arrow">▼</span>
+    </div>
+    <button class="analyze-btn" id="analyzeBtn">⚡ ANALYSE STARTEN</button>
+    <div class="coin-chips">
+      <div class="chip" data-coin="XRP">XRP</div>
+      <div class="chip" data-coin="BTC">BTC</div>
+      <div class="chip" data-coin="ETH">ETH</div>
+      <div class="chip" data-coin="SOL">SOL</div>
+    </div>
+  </div>
+
+  <div class="container" id="dashboardContent">
+    <div class="price-hero" id="priceHero">
+      <div class="current-price">
+        <div class="price-label">AKTUELLER KURS</div>
+        <div class="price-value" id="priceValue">–</div>
+        <div class="price-change up" id="priceChange">Wird geladen...</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-label">24H HOCH</div><div class="stat-val" id="stat24hH">–</div></div>
+        <div class="stat-box"><div class="stat-label">24H TIEF</div><div class="stat-val" id="stat24hL">–</div></div>
+        <div class="stat-box"><div class="stat-label">7D PERF.</div><div class="stat-val" id="stat7d">–</div></div>
+        <div class="stat-box"><div class="stat-label">30D PERF.</div><div class="stat-val" id="stat30d">–</div></div>
+      </div>
+      <div class="signal-box neutral" id="signalBox">
+        <div class="signal-label">DAYTRADER SIGNAL</div>
+        <div class="signal-value" id="signalValue">HALTEN</div>
+        <div class="signal-sub" id="signalSub">Vorsichtiges Abwarten</div>
+        <div class="signal-confidence" id="signalConf">⚡ Konfidenz: 65%</div>
+      </div>
+      <div class="price-hero-bg" id="heroBg">XRP</div>
+    </div>
+
+    <div id="mainContent">
+      <!-- Hier wird der Chart und weitere Komponenten eingefügt -->
+      <p style="text-align:center;padding:40px;color:var(--text-dim);">
+        Dashboard wird geladen... Bitte warten.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Main Module -->
+<script type="module" src="src/main.js"></script>
+
+</body>
+</html>
