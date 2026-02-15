@@ -660,7 +660,152 @@ width: 6px; height: 6px; border-radius: 50%;
 background: var(–green);
 animation: pulse 2s infinite;
 }
-/* ── Orderbook & Binance Widget ── */
+/* ── NAV TABS ── */
+.nav-tabs {
+display:flex; gap:4px; padding:0 20px;
+background:var(–surface); border-bottom:1px solid var(–border);
+position:sticky; top:0; z-index:50;
+max-width:100%; overflow-x:auto;
+}
+.nav-tab {
+padding:12px 24px; font-family:‘Orbitron’,monospace; font-size:11px;
+font-weight:700; letter-spacing:2px; color:var(–text-dim);
+border:none; background:none; cursor:pointer;
+border-bottom:3px solid transparent; transition:all 0.2s;
+white-space:nowrap;
+}
+.nav-tab:hover { color:var(–accent); }
+.nav-tab.active { color:var(–accent); border-bottom-color:var(–accent); }
+
+/* ── PORTFOLIO PAGE ── */
+.page { display:none; }
+.page.active { display:block; }
+
+.portfolio-grid { display:grid; grid-template-columns:380px 1fr; gap:20px; margin-bottom:20px; }
+.portfolio-input-card { background:var(–surface); border:1px solid var(–border); border-radius:16px; padding:24px; }
+.portfolio-input-card h3 { font-family:‘Orbitron’,monospace; font-size:13px; color:var(–accent); margin-bottom:18px; letter-spacing:2px; }
+
+.coin-input-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; animation:fadeIn 0.3s ease; }
+.coin-input-row select {
+flex:1; background:var(–surface2); border:1px solid var(–border);
+color:var(–text); padding:8px 10px; border-radius:8px;
+font-family:‘Share Tech Mono’,monospace; font-size:12px;
+}
+.coin-input-row input {
+width:100px; background:var(–surface2); border:1px solid var(–border);
+color:var(–accent); padding:8px 10px; border-radius:8px;
+font-family:‘Orbitron’,monospace; font-size:12px; text-align:right;
+}
+.coin-input-row input:focus, .coin-input-row select:focus {
+outline:none; border-color:var(–accent); box-shadow:0 0 8px rgba(0,212,255,0.2);
+}
+.remove-btn {
+width:28px; height:28px; border-radius:6px; border:1px solid var(–border);
+background:rgba(255,58,58,0.1); color:var(–red); cursor:pointer;
+font-size:14px; display:flex; align-items:center; justify-content:center;
+transition:all 0.2s;
+}
+.remove-btn:hover { background:rgba(255,58,58,0.3); }
+
+.add-coin-btn {
+width:100%; padding:10px; background:rgba(0,212,255,0.05);
+border:1px dashed var(–border); border-radius:8px; color:var(–text-dim);
+font-family:‘Share Tech Mono’,monospace; font-size:12px; cursor:pointer;
+transition:all 0.2s; margin-top:4px;
+}
+.add-coin-btn:hover { border-color:var(–accent); color:var(–accent); }
+
+.horizon-btns { display:flex; gap:8px; margin:16px 0; }
+.horizon-btn {
+flex:1; padding:10px; border-radius:8px; border:1px solid var(–border);
+background:var(–surface2); color:var(–text-dim); cursor:pointer;
+font-family:‘Orbitron’,monospace; font-size:11px; font-weight:700;
+letter-spacing:1px; transition:all 0.2s;
+}
+.horizon-btn.active {
+background:rgba(0,212,255,0.15); border-color:var(–accent);
+color:var(–accent); box-shadow:0 0 12px rgba(0,212,255,0.2);
+}
+
+.analyze-portfolio-btn {
+width:100%; padding:14px; border-radius:10px; border:none;
+background:linear-gradient(135deg,#00d4ff,#0050aa);
+color:#fff; font-family:‘Orbitron’,monospace; font-size:13px;
+font-weight:700; letter-spacing:2px; cursor:pointer;
+box-shadow:var(–glow); transition:all 0.3s; margin-top:8px;
+}
+.analyze-portfolio-btn:hover { transform:translateY(-2px); box-shadow:0 0 30px rgba(0,212,255,0.5); }
+.analyze-portfolio-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+/* ── ERGEBNIS-KARTEN ── */
+.advice-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; margin-bottom:20px; }
+.advice-card {
+background:var(–surface); border:1px solid var(–border); border-radius:14px;
+padding:20px; position:relative; overflow:hidden; transition:all 0.3s;
+animation:fadeIn 0.4s ease both;
+}
+.advice-card:hover { transform:translateY(-3px); box-shadow:var(–glow); }
+.advice-card.hold  { border-color:rgba(255,215,0,0.3); }
+.advice-card.swap  { border-color:rgba(0,255,136,0.3); }
+.advice-card.sell  { border-color:rgba(255,58,58,0.3); }
+.advice-card::before {
+content:’’; position:absolute; top:0; left:0; right:0; height:3px;
+}
+.advice-card.hold::before  { background:var(–yellow); }
+.advice-card.swap::before  { background:var(–green); }
+.advice-card.sell::before  { background:var(–red); }
+
+.advice-action {
+display:inline-flex; align-items:center; gap:6px;
+padding:4px 12px; border-radius:20px; font-family:‘Orbitron’,monospace;
+font-size:10px; font-weight:700; letter-spacing:1px; margin-bottom:12px;
+}
+.advice-action.hold  { background:rgba(255,215,0,0.15); color:var(–yellow); border:1px solid rgba(255,215,0,0.3); }
+.advice-action.swap  { background:rgba(0,255,136,0.15); color:var(–green);  border:1px solid rgba(0,255,136,0.3); }
+.advice-action.sell  { background:rgba(255,58,58,0.15);  color:var(–red);   border:1px solid rgba(255,58,58,0.3); }
+
+.advice-coin-row { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+.advice-coin-name { font-family:‘Orbitron’,monospace; font-size:16px; font-weight:900; color:#fff; }
+.advice-arrow { font-size:22px; margin:4px 0; }
+.advice-target { font-family:‘Orbitron’,monospace; font-size:14px; color:var(–green); }
+.advice-potential {
+font-family:‘Orbitron’,monospace; font-size:22px; font-weight:900;
+margin:8px 0;
+}
+.advice-potential.pos { color:var(–green); }
+.advice-potential.neg { color:var(–red); }
+.advice-potential.neu { color:var(–yellow); }
+
+.advice-meta { display:flex; gap:16px; margin:10px 0; flex-wrap:wrap; }
+.advice-meta-item { font-family:‘Share Tech Mono’,monospace; font-size:11px; color:var(–text-dim); }
+.advice-meta-item strong { color:var(–text); }
+
+.advice-reason { font-size:13px; color:var(–text); line-height:1.6; margin-top:10px; border-top:1px solid var(–border); padding-top:10px; }
+
+.confidence-bar-wrap { margin-top:10px; }
+.confidence-bar-wrap label { font-family:‘Share Tech Mono’,monospace; font-size:10px; color:var(–text-dim); }
+.confidence-bar { height:4px; background:var(–surface2); border-radius:2px; margin-top:4px; }
+.confidence-fill { height:100%; border-radius:2px; transition:width 1s ease; }
+
+/* Summary Row */
+.portfolio-summary {
+background:var(–surface); border:1px solid var(–border); border-radius:14px;
+padding:20px; margin-bottom:20px; display:grid;
+grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px;
+}
+.summary-stat { text-align:center; }
+.summary-stat-val { font-family:‘Orbitron’,monospace; font-size:22px; font-weight:900; }
+.summary-stat-lbl { font-family:‘Share Tech Mono’,monospace; font-size:10px; color:var(–text-dim); margin-top:4px; letter-spacing:1px; }
+
+.ai-full-advice { background:var(–surface); border:1px solid rgba(0,212,255,0.2); border-radius:14px; padding:24px; margin-bottom:20px; }
+.ai-full-advice h3 { font-family:‘Orbitron’,monospace; font-size:13px; color:var(–accent); margin-bottom:14px; letter-spacing:2px; }
+.ai-full-advice pre { white-space:pre-wrap; font-family:‘Share Tech Mono’,monospace; font-size:13px; line-height:1.8; color:var(–text); }
+
+.portfolio-empty { text-align:center; padding:60px 20px; color:var(–text-dim); font-family:‘Share Tech Mono’,monospace; }
+.portfolio-empty .empty-icon { font-size:48px; margin-bottom:16px; }
+
+@media(max-width:900px) { .portfolio-grid { grid-template-columns:1fr; } }
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 .ob-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
 .ob-pressure-bar-wrap { display:flex; align-items:center; gap:10px; margin:16px 0 8px; }
 .ob-pressure-bar { flex:1; height:14px; background:var(–surface2); border-radius:7px; overflow:hidden; }
@@ -749,8 +894,16 @@ animation: pulse 2s infinite;
   </header>
 </div>
 
-<!-- SELECTOR BAR -->
+<!-- NAV TABS -->
 
+<div class="nav-tabs" id="navTabs">
+  <button class="nav-tab active" onclick="switchPage('dashboard')">⚡ DASHBOARD</button>
+  <button class="nav-tab" onclick="switchPage('portfolio')">◈ PORTFOLIO ADVISOR</button>
+</div>
+
+<!-- ====== PAGE: DASHBOARD ====== -->
+
+<div class="page active" id="pageDashboard">
 <div class="selector-bar">
   <span class="selector-label">COIN AUSWÄHLEN:</span>
   <div class="coin-select-wrap">
@@ -1078,7 +1231,68 @@ animation: pulse 2s infinite;
   </footer>
 </div>
 
-</div><!-- end dashboardWrapper -->
+</div><!-- end pageDashboard -->
+
+<!-- ====== PAGE: PORTFOLIO ADVISOR ====== -->
+
+<div class="page" id="pagePortfolio">
+<div class="container">
+
+  <div style="padding:24px 0 16px;">
+    <h2 style="font-family:'Orbitron',monospace;font-size:18px;color:#fff;letter-spacing:3px;">◈ PORTFOLIO ADVISOR</h2>
+    <p style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--accent);margin-top:6px;letter-spacing:1px;">KI-ANALYSE · TAUSCH-EMPFEHLUNGEN · RENDITE-OPTIMIERUNG</p>
+  </div>
+
+  <!-- INPUT + RESULTS GRID -->
+
+  <div class="portfolio-grid">
+
+```
+<!-- LINKE SPALTE: Eingabe -->
+<div>
+  <div class="portfolio-input-card">
+    <h3>◈ MEINE COINS</h3>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);margin-bottom:14px;">Coin auswählen · Betrag in USD eingeben</div>
+
+    <div id="coinInputList">
+      <!-- Zeilen werden per JS eingefügt -->
+    </div>
+
+    <button class="add-coin-btn" onclick="addCoinRow()">+ COIN HINZUFÜGEN</button>
+
+    <div style="margin-top:20px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);margin-bottom:10px;">ANLAGEHORIZONT:</div>
+      <div class="horizon-btns">
+        <button class="horizon-btn active" data-days="3" onclick="setHorizon(3)">3 TAGE</button>
+        <button class="horizon-btn" data-days="7" onclick="setHorizon(7)">7 TAGE</button>
+        <button class="horizon-btn" data-days="30" onclick="setHorizon(30)">30 TAGE</button>
+      </div>
+    </div>
+
+    <button class="analyze-portfolio-btn" id="portfolioAnalyzeBtn" onclick="analyzePortfolio()">
+      ⚡ ANALYSE STARTEN
+    </button>
+
+    <div style="margin-top:14px;font-size:11px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;line-height:1.6;border-top:1px solid var(--border);padding-top:14px;">
+      ⚠️ Alle Empfehlungen basieren auf technischen Indikatoren und KI-Analyse. Kein Finanzrat. Eigene Recherche erforderlich.
+    </div>
+  </div>
+</div>
+
+<!-- RECHTE SPALTE: Ergebnisse -->
+<div id="portfolioResults">
+  <div class="portfolio-empty">
+    <div class="empty-icon">◈</div>
+    <div>Coins eingeben und Analyse starten</div>
+    <div style="margin-top:8px;font-size:11px;opacity:0.5;">KI analysiert Marktdaten und gibt Tausch-Empfehlungen</div>
+  </div>
+</div>
+```
+
+  </div>
+
+</div>
+</div><!-- end pagePortfolio -->
 
 <script>
 const COIN_DATA = {
@@ -2427,8 +2641,9 @@ function doLogin() {
         if (sc) { sc.textContent = fg.value; sc.style.color = fg.value < 40 ? 'var(--red)' : fg.value < 60 ? 'var(--yellow)' : 'var(--green)'; }
         if (lb) lb.textContent = fg.label.toUpperCase();
       });
-      // Start analysis
+      // Start analysis + init portfolio
       runAnalysis();
+      initPortfolio();
     }, 500);
     err.classList.remove('show');
   } else {
@@ -2458,22 +2673,446 @@ function doLogout() {
   }, 400);
 }
 
-// Enter key support
-document.addEventListener('DOMContentLoaded', () => {
-  ['loginUser','loginPass'].forEach(id => {
-    document.getElementById(id).addEventListener('keydown', e => {
-      if (e.key === 'Enter') doLogin();
-    });
+// ════════════════════════════════════════
+// PORTFOLIO ADVISOR
+// ════════════════════════════════════════
+let portfolioHorizon = 3;
+let portfolioRows = [];
+
+const ALL_COINS = [
+  'BTC','ETH','XRP','BNB','SOL','ADA','AVAX','DOGE',
+  'DOT','LINK','MATIC','UNI','ATOM','LTC','NEAR',
+  'ARB','OP','SUI','SHIB','PEPE','FLOKI'
+];
+
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function setHorizon(days) {
+  portfolioHorizon = days;
+  document.querySelectorAll('.horizon-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.days) === days);
   });
+}
+
+function buildCoinOptions(selected = '') {
+  return ALL_COINS.map(sym => {
+    const d = COIN_DATA[sym];
+    return `<option value="${sym}" ${sym === selected ? 'selected' : ''}>${sym} – ${d ? d.name : sym}</option>`;
+  }).join('');
+}
+
+function addCoinRow(sym = '', usd = '') {
+  const id = Date.now();
+  portfolioRows.push(id);
+  const list = document.getElementById('coinInputList');
+  const row = document.createElement('div');
+  row.className = 'coin-input-row';
+  row.id = 'row-' + id;
+  row.innerHTML = `
+    <select onchange="updateRowCoin(${id},this.value)">${buildCoinOptions(sym)}</select>
+    <input type="number" id="amt-${id}" placeholder="USD" min="0" step="0.01" value="${usd}" />
+    <button class="remove-btn" onclick="removeCoinRow(${id})">✕</button>
+  `;
+  list.appendChild(row);
+}
+
+function removeCoinRow(id) {
+  const el = document.getElementById('row-' + id);
+  if (el) el.remove();
+  portfolioRows = portfolioRows.filter(r => r !== id);
+}
+
+function updateRowCoin(id, sym) { /* Live-Preis könnte hier angezeigt werden */ }
+
+function getPortfolioEntries() {
+  return portfolioRows.map(id => {
+    const row = document.getElementById('row-' + id);
+    if (!row) return null;
+    const sym = row.querySelector('select').value;
+    const usd = parseFloat(document.getElementById('amt-' + id).value) || 0;
+    return usd > 0 ? { sym, usd } : null;
+  }).filter(Boolean);
+}
+
+async function analyzePortfolio() {
+  const entries = getPortfolioEntries();
+  if (entries.length === 0) {
+    document.getElementById('portfolioResults').innerHTML =
+      `<div class="portfolio-empty"><div class="empty-icon">⚠️</div><div>Bitte mindestens einen Coin mit Betrag eingeben.</div></div>`;
+    return;
+  }
+
+  const btn = document.getElementById('portfolioAnalyzeBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ ANALYSIERE...';
+
+  document.getElementById('portfolioResults').innerHTML =
+    `<div class="portfolio-empty"><div class="empty-icon" style="animation:spin 1s linear infinite;display:inline-block">⚡</div><div>Live-Daten werden geladen...</div></div>`;
+
+  // ── Live-Daten für alle Coins im Portfolio laden ──
+  const liveData = {};
+  await Promise.all(entries.map(async ({ sym }) => {
+    if (liveData[sym]) return;
+    const [ticker, klines] = await Promise.all([
+      fetchBinanceTicker(sym),
+      fetchBinanceKlines(sym, '1h', 200),
+    ]);
+    liveData[sym] = { ticker, klines };
+    // COIN_DATA updaten
+    if (ticker) {
+      COIN_DATA[sym].price  = fmtPrice(ticker.price);
+      COIN_DATA[sym].change = ticker.change24h.toFixed(2);
+    }
+    if (klines && klines.length >= 26) {
+      const closes = klines.map(k => k.c);
+      const rsi  = calcRSI(closes, 14);
+      const macd = calcMACD(closes);
+      const bb   = calcBB(closes, 20);
+      const will = calcWilliams(closes, 14);
+      if (rsi  !== null) { COIN_DATA[sym].rsi = rsi.toFixed(2); COIN_DATA[sym].rsiSig = rsi < 30 ? 'buy' : rsi > 70 ? 'sell' : 'neutral'; }
+      if (macd !== null) { COIN_DATA[sym].macd = macd.toFixed(6); COIN_DATA[sym].macdSig = macd > 0 ? 'buy' : 'sell'; }
+      if (bb   !== null)   COIN_DATA[sym].bb = bb.toFixed(4);
+      if (will !== null) { COIN_DATA[sym].williams = will.toFixed(2); COIN_DATA[sym].willSig = will < -80 ? 'buy' : will > -20 ? 'sell' : 'neutral'; }
+    }
+  }));
+
+  // ── Alle anderen Coins als Tauschkandidaten auch laden ──
+  const ownedSyms = new Set(entries.map(e => e.sym));
+  const candidates = ALL_COINS.filter(s => !ownedSyms.has(s));
+  await Promise.all(candidates.slice(0, 10).map(async sym => {
+    if (liveData[sym]) return;
+    const [ticker, klines] = await Promise.all([
+      fetchBinanceTicker(sym),
+      fetchBinanceKlines(sym, '1h', 100),
+    ]);
+    liveData[sym] = { ticker, klines };
+    if (ticker) COIN_DATA[sym].price = fmtPrice(ticker.price);
+    if (klines && klines.length >= 26) {
+      const closes = klines.map(k => k.c);
+      const rsi = calcRSI(closes, 14);
+      const macd = calcMACD(closes);
+      if (rsi  !== null) { COIN_DATA[sym].rsi = rsi.toFixed(2); COIN_DATA[sym].rsiSig = rsi < 30 ? 'buy' : rsi > 70 ? 'sell' : 'neutral'; }
+      if (macd !== null) { COIN_DATA[sym].macd = macd.toFixed(6); COIN_DATA[sym].macdSig = macd > 0 ? 'buy' : 'sell'; }
+    }
+  }));
+
+  document.getElementById('portfolioResults').innerHTML =
+    `<div class="portfolio-empty"><div class="empty-icon" style="animation:spin 1s linear infinite;display:inline-block">⚡</div><div>KI generiert Empfehlungen...</div></div>`;
+
+  // ── KI-Analyse aufrufen ──
+  try {
+    const result = await getPortfolioAdvice(entries, liveData, portfolioHorizon);
+    renderPortfolioResults(entries, liveData, result, portfolioHorizon);
+  } catch(e) {
+    renderPortfolioResults(entries, liveData, null, portfolioHorizon);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '⚡ ANALYSE STARTEN';
+}
+
+// ── Bewertungs-Score für einen Coin (0–100) ──
+function scoreCoin(sym, horizon) {
+  const d = COIN_DATA[sym];
+  if (!d) return 0;
+  let score = 50;
+  const rsi  = parseFloat(d.rsi)  || 50;
+  const macd = parseFloat(d.macd) || 0;
+  const chg  = parseFloat(d.change) || 0;
+  const p7d  = parseFloat(d.p7d)  || 0;
+  const p30d = parseFloat(d.p30d) || 0;
+  const bb   = parseFloat(d.bb)   || 0.15;
+  const will = parseFloat(d.williams) || -50;
+
+  // RSI (überverkauft = Kaufgelegenheit)
+  if (rsi < 25) score += 20; else if (rsi < 35) score += 12;
+  else if (rsi > 75) score -= 20; else if (rsi > 65) score -= 10;
+
+  // MACD
+  if (macd > 0) score += 10; else score -= 8;
+
+  // Williams %R
+  if (will < -80) score += 8; else if (will > -20) score -= 8;
+
+  // Trend je Horizont
+  if (horizon === 3) {
+    if (chg > 3) score += 8; else if (chg < -3) score -= 8;
+  } else if (horizon === 7) {
+    if (p7d > 5) score += 10; else if (p7d < -10) score -= 12;
+    if (chg > 2) score += 5;
+  } else { // 30d
+    if (p30d > 10) score += 15; else if (p30d < -30) score += 8; // tief = Bounce-Chance
+    if (p7d > 3) score += 8;
+  }
+
+  // Volatilität (bei kurzem Horizont gut für große Moves)
+  if (horizon <= 7 && bb > 0.2) score += 5;
+
+  // Risiko-Abschlag
+  const risk = d.risk || 3;
+  score -= (risk - 2) * 3;
+
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+// ── Erwartetes Potenzial % ──
+function estimatePotential(sym, horizon) {
+  const d = COIN_DATA[sym];
+  const score = scoreCoin(sym, horizon);
+  const rsi   = parseFloat(d?.rsi) || 50;
+  const bb    = parseFloat(d?.bb) || 0.15;
+  const base  = score - 50;           // -50 bis +50
+  const volMulti = 1 + bb * 2;        // hohes BB = mehr Potenzial
+  const hMulti   = horizon === 3 ? 0.8 : horizon === 7 ? 1.4 : 3.5;
+  return parseFloat((base * 0.15 * volMulti * hMulti).toFixed(1));
+}
+
+// ── KI-Prompt für Portfolio ──
+async function getPortfolioAdvice(entries, liveData, horizon) {
+  const totalUsd = entries.reduce((s, e) => s + e.usd, 0);
+  const portfolioStr = entries.map(e => {
+    const d = COIN_DATA[e.sym];
+    const score = scoreCoin(e.sym, horizon);
+    return `  ${e.sym} (${d?.name}): $${e.usd.toFixed(2)} (${(e.usd/totalUsd*100).toFixed(1)}%) | RSI: ${d?.rsi} | MACD: ${d?.macd > 0 ? '+':''} ${d?.macd} | Signal: ${d?.signal?.toUpperCase()} | Score: ${score}/100`;
+  }).join('\n');
+
+  const topCandidates = ALL_COINS
+    .filter(s => !entries.find(e => e.sym === s))
+    .map(sym => ({ sym, score: scoreCoin(sym, horizon), pot: estimatePotential(sym, horizon) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6)
+    .map(c => {
+      const d = COIN_DATA[c.sym];
+      return `  ${c.sym} (${d?.name}): Score ${c.score}/100 | RSI: ${d?.rsi} | Potenzial: +${c.pot}% | Signal: ${d?.signal?.toUpperCase()}`;
+    }).join('\n');
+
+  const prompt = `Du bist ein erfahrener Krypto-Portfolio-Manager. Analysiere dieses Portfolio und gib präzise Empfehlungen für einen Horizont von ${horizon} Tagen.
+
+AKTUELLES PORTFOLIO (Gesamt: $${totalUsd.toFixed(2)}):
+${portfolioStr}
+
+TOP TAUSCH-KANDIDATEN (nicht im Portfolio):
+${topCandidates}
+
+Erstelle eine strukturierte Analyse auf Deutsch mit GENAU diesem Format:
+
+PORTFOLIO-BEWERTUNG:
+[2-3 Sätze zur Gesamtlage des Portfolios]
+
+EMPFEHLUNGEN:
+[Für jeden Coin: HALTEN / TAUSCHEN GEGEN [COIN] / VERKAUFEN – mit 1-2 Satz Begründung und konkretem Zeitpunkt]
+
+BESTE TAUSCH-CHANCE:
+[Den einen Coin der aktuell das höchste ${horizon}-Tage-Potenzial hat, mit Begründung]
+
+RISIKO-HINWEIS:
+[1 Satz spezifisch für dieses Portfolio]
+
+Maximal 280 Wörter. Keine allgemeinen Floskeln. Beziehe dich immer auf die konkreten RSI/MACD-Werte.`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await response.json();
+  return data.content?.[0]?.text || null;
+}
+
+// ── Ergebnisse rendern ──
+function renderPortfolioResults(entries, liveData, aiText, horizon) {
+  const totalUsd = entries.reduce((s, e) => s + e.usd, 0);
+
+  // Top-Kandidaten berechnen
+  const candidates = ALL_COINS
+    .filter(s => !entries.find(e => e.sym === s))
+    .map(sym => ({ sym, score: scoreCoin(sym, horizon), pot: estimatePotential(sym, horizon) }))
+    .sort((a, b) => b.score - a.score);
+
+  // Empfehlung pro gehaltenem Coin
+  const recommendations = entries.map(entry => {
+    const { sym, usd } = entry;
+    const d = COIN_DATA[sym];
+    const myScore  = scoreCoin(sym, horizon);
+    const myPot    = estimatePotential(sym, horizon);
+    const bestAlt  = candidates[0];
+
+    let action, targetSym, reason, colorClass;
+
+    if (myScore >= 62) {
+      action = 'hold'; targetSym = null; colorClass = 'hold';
+      reason = `RSI ${d?.rsi} zeigt ${parseFloat(d?.rsi) < 40 ? 'überverkaufte Zone – Erholung wahrscheinlich' : 'gesunden Aufwärtstrend'}. MACD ${parseFloat(d?.macd) > 0 ? 'positiv' : 'dreht'} – Halten für ${horizon} Tage empfohlen.`;
+    } else if (bestAlt && bestAlt.score > myScore + 15) {
+      action = 'swap'; targetSym = bestAlt.sym; colorClass = 'swap';
+      const td = COIN_DATA[bestAlt.sym];
+      reason = `${sym} Score ${myScore}/100 vs. ${bestAlt.sym} Score ${bestAlt.score}/100. ${bestAlt.sym} RSI ${td?.rsi} deutlich stärker aufgestellt für ${horizon}-Tage-Horizont.`;
+    } else if (myScore < 38) {
+      action = 'sell'; targetSym = null; colorClass = 'sell';
+      reason = `RSI ${d?.rsi} + MACD ${d?.macd > 0 ? 'leicht positiv' : 'negativ'} – schwaches Setup. Risiko ${d?.risk}/5. Verkauf und Umdispositon erwägen.`;
+    } else {
+      action = 'hold'; targetSym = null; colorClass = 'hold';
+      reason = `Neutrales Signal (Score ${myScore}/100). Kein klarer Vorteil beim Tauschen – Position halten und Markt beobachten.`;
+    }
+
+    return { sym, usd, d, myScore, myPot, action, targetSym, colorClass, reason };
+  });
+
+  // Gesamtpotenzial
+  const avgPot = entries.reduce((s, e) => s + estimatePotential(e.sym, horizon), 0) / entries.length;
+  const swapCount = recommendations.filter(r => r.action === 'swap').length;
+  const holdCount = recommendations.filter(r => r.action === 'hold').length;
+  const bestGlobal = candidates[0];
+
+  const horizonLabel = horizon === 3 ? '3 Tage' : horizon === 7 ? '7 Tage' : '30 Tage';
+
+  let html = `
+  <!-- SUMMARY -->
+  <div class="portfolio-summary">
+    <div class="summary-stat">
+      <div class="summary-stat-val" style="color:var(--accent)">$${totalUsd.toLocaleString('de-DE', {minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      <div class="summary-stat-lbl">PORTFOLIO GESAMT</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-stat-val ${avgPot >= 0 ? 'pos' : 'neg'}" style="color:${avgPot >= 0 ? 'var(--green)' : 'var(--red)'}">${avgPot >= 0 ? '+':''}${avgPot.toFixed(1)}%</div>
+      <div class="summary-stat-lbl">Ø POTENZIAL (${horizonLabel})</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-stat-val" style="color:var(--green)">${holdCount}</div>
+      <div class="summary-stat-lbl">HALTEN</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-stat-val" style="color:var(--yellow)">${swapCount}</div>
+      <div class="summary-stat-lbl">TAUSCHEN</div>
+    </div>
+    ${bestGlobal ? `
+    <div class="summary-stat">
+      <div class="summary-stat-val" style="color:var(--accent)">${bestGlobal.sym}</div>
+      <div class="summary-stat-lbl">BESTE CHANCE</div>
+    </div>` : ''}
+  </div>
+
+  <!-- EMPFEHLUNGS-KARTEN -->
+  <div class="advice-grid">`;
+
+  recommendations.forEach((rec, i) => {
+    const potClass = rec.myPot > 0 ? 'pos' : rec.myPot < 0 ? 'neg' : 'neu';
+    const confPct  = rec.myScore;
+    const confColor = confPct >= 62 ? '#00ff88' : confPct >= 45 ? '#ffd700' : '#ff3a3a';
+    const actionLabel = rec.action === 'hold' ? '⏸ HALTEN' : rec.action === 'swap' ? '⇄ TAUSCHEN' : '✕ VERKAUFEN';
+
+    html += `
+    <div class="advice-card ${rec.colorClass}" style="animation-delay:${i*0.08}s">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div class="advice-action ${rec.colorClass}">${actionLabel}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim)">Score: ${rec.myScore}/100</div>
+      </div>
+      <div class="advice-coin-row">
+        <div>
+          <div class="advice-coin-name">${rec.sym}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim)">${rec.d?.name || rec.sym}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Orbitron',monospace;font-size:14px;color:var(--accent)">${rec.d?.price || '–'}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${parseFloat(rec.d?.change) >= 0 ? 'var(--green)':'var(--red)'}">
+            ${parseFloat(rec.d?.change) >= 0 ? '▲ +':' ▼ '}${rec.d?.change}%
+          </div>
+        </div>
+      </div>
+      ${rec.action === 'swap' && rec.targetSym ? `
+      <div style="display:flex;align-items:center;gap:8px;margin:8px 0;">
+        <span style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim)">${rec.sym}</span>
+        <span style="color:var(--green);font-size:18px">→</span>
+        <span style="font-family:'Orbitron',monospace;font-size:15px;color:var(--green);font-weight:900">${rec.targetSym}</span>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim)">(${COIN_DATA[rec.targetSym]?.name})</span>
+      </div>
+      <div style="font-family:'Orbitron',monospace;font-size:13px;color:var(--green);margin-bottom:4px;">
+        Potenzial: +${estimatePotential(rec.targetSym, horizon)}% (${horizonLabel})
+      </div>` : ''}
+      <div class="advice-potential ${potClass}">
+        ${rec.myPot >= 0 ? '+':''}${rec.myPot}%
+        <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);font-weight:400"> (${horizonLabel})</span>
+      </div>
+      <div class="advice-meta">
+        <div class="advice-meta-item">RSI: <strong>${rec.d?.rsi || '–'}</strong></div>
+        <div class="advice-meta-item">MACD: <strong style="color:${parseFloat(rec.d?.macd)>0?'var(--green)':'var(--red)'}">
+          ${parseFloat(rec.d?.macd) > 0 ? '▲' : '▼'} ${rec.d?.macd || '–'}</strong></div>
+        <div class="advice-meta-item">Risiko: <strong>${rec.d?.risk || '–'}/5</strong></div>
+        <div class="advice-meta-item">Wert: <strong>$${rec.usd.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div>
+      </div>
+      <div class="advice-reason">${rec.reason}</div>
+      <div class="confidence-bar-wrap">
+        <label>SIGNAL-STÄRKE: ${confPct}%</label>
+        <div class="confidence-bar">
+          <div class="confidence-fill" style="width:0%;background:${confColor};transition:width 1.2s ease ${i*0.1}s;"
+            data-target="${confPct}"></div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  html += `</div>`;
+
+  // KI-Analyse
+  if (aiText) {
+    html += `
+    <div class="ai-full-advice">
+      <h3>⚡ KI PORTFOLIO-ANALYSE · ${horizonLabel.toUpperCase()}</h3>
+      <pre>${aiText}</pre>
+
+```
+</div>`;
+```
+
+}
+
+document.getElementById(‘portfolioResults’).innerHTML = html;
+
+// Confidence-Bars animieren
+setTimeout(() => {
+document.querySelectorAll(’.confidence-fill[data-target]’).forEach(el => {
+el.style.width = el.dataset.target + ‘%’;
+});
+}, 100);
+}
+
+// Portfolio-Seite initialisieren
+function initPortfolio() {
+if (portfolioRows.length === 0) {
+addCoinRow(‘XRP’, ‘’);
+addCoinRow(‘SOL’, ‘’);
+}
+}
+
+// CSS spin animation
+const spinStyle = document.createElement(‘style’);
+spinStyle.textContent = ‘@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}’;
+document.head.appendChild(spinStyle);
+
+// Enter key support
+document.addEventListener(‘DOMContentLoaded’, () => {
+[‘loginUser’,‘loginPass’].forEach(id => {
+document.getElementById(id).addEventListener(‘keydown’, e => {
+if (e.key === ‘Enter’) doLogin();
+});
+});
 });
 
 // Clock
 function updateTime() {
-  const now = new Date();
-  const d = now.toLocaleDateString('de-DE', { day:'2-digit', month:'long', year:'numeric' });
-  const t = now.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
-  const el = document.getElementById('timestamp');
-  if (el) el.textContent = `${d.toUpperCase()} · ${t} CET`;
+const now = new Date();
+const d = now.toLocaleDateString(‘de-DE’, { day:‘2-digit’, month:‘long’, year:‘numeric’ });
+const t = now.toLocaleTimeString(‘de-DE’, { hour:‘2-digit’, minute:‘2-digit’ });
+const el = document.getElementById(‘timestamp’);
+if (el) el.textContent = `${d.toUpperCase()} · ${t} CET`;
 }
 updateTime();
 setInterval(updateTime, 60000);
