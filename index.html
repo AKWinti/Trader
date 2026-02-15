@@ -828,6 +828,43 @@ grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px;
 @media(max-width:768px){ .ob-grid{grid-template-columns:1fr} }
 </style>
 
+<script>
+var USERS = { admin: 'Admin1' };
+
+function doLogin() {
+  var user = (document.getElementById('loginUser').value || '').trim();
+  var pass = document.getElementById('loginPass').value || '';
+  var errEl = document.getElementById('loginError');
+
+  if (USERS[user] && USERS[user] === pass) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboardWrapper').style.display = 'block';
+    var badge = document.getElementById('userBadge');
+    if (badge) badge.textContent = user.toUpperCase();
+    try { initPortfolio(); } catch(e) {}
+    setTimeout(function() { try { runAnalysis(); } catch(e) {} }, 200);
+  } else {
+    if (errEl) {
+      errEl.classList.remove('show');
+      void errEl.offsetWidth;
+      errEl.classList.add('show');
+    }
+    var passEl = document.getElementById('loginPass');
+    if (passEl) { passEl.value = ''; passEl.focus(); }
+  }
+}
+
+function doLogout() {
+  document.getElementById('dashboardWrapper').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  var err = document.getElementById('loginError');
+  if (err) err.classList.remove('show');
+  if (window._priceRefreshTimer) clearTimeout(window._priceRefreshTimer);
+}
+</script>
+
 </head>
 <body>
 
@@ -859,7 +896,7 @@ grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px;
   </div>
 </div>
 
-<button class="login-btn" onclick="doLogin()">⚡ EINLOGGEN</button>
+<button class="login-btn" id="loginBtn" onclick="doLogin()">⚡ EINLOGGEN</button>
 
 <div class="login-error" id="loginError">
   ✕ &nbsp; UNGÜLTIGE ZUGANGSDATEN
@@ -1585,12 +1622,8 @@ function quickSelect(sym) {
   runAnalysis();
 }
 
-document.getElementById('coinSelect').addEventListener('change', function() {
-  const sym = this.value;
-  document.querySelectorAll('.chip').forEach(c => {
-    c.classList.toggle('active', c.textContent === sym);
-  });
-});
+// coinSelect Change-Handler (in DOMContentLoaded da DOM nötig)
+// Wird unten im DOMContentLoaded registriert
 
 async function runAnalysis() {
   const sym = document.getElementById('coinSelect').value;
@@ -2187,19 +2220,35 @@ Erstelle eine strukturierte Analyse mit genau diesen 4 Abschnitten:
 
 Wichtig: Beziehe dich immer namentlich auf ${sym}/${d.name}, nie auf andere Coins. Maximal 220 Wörter. Professionell und präzise.`;
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 1000,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-
-  if (!response.ok) throw new Error('API error');
-  const data = await response.json();
-  return data.content.map(b => b.text || '').join('');
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5-20250929',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!response.ok) throw new Error('API ' + response.status);
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.content.map(function(b) { return b.text || ''; }).join('');
+  } catch(e) {
+    // Fallback: Lokale Analyse ohne KI
+    var sig = SIGNAL_LABELS[d.signal] || SIGNAL_LABELS.neutral;
+    var rsiNum = parseFloat(d.rsi) || 50;
+    var rsiText = rsiNum < 30 ? 'überverkauft (Bounce möglich)' : rsiNum > 70 ? 'überkauft (Rücksetzer möglich)' : 'neutral';
+    return d.name + ' (' + sym + ') – Offline-Analyse (' + dateStr + ')\n\n' +
+      'MARKTLAGE: ' + d.name + ' notiert bei ' + d.price + ' (' + (parseFloat(d.change)>=0?'+':'') + d.change + '% / 24H). ' +
+      'RSI ' + d.rsi + ' – ' + rsiText + '. MACD ' + (parseFloat(d.macd)>0?'positiv (bullisch)':'negativ (bärisch)') + '.\n\n' +
+      '📍 KURZFRISTIG (1-2 Tage): Support bei ' + d.sup1 + ', Widerstand bei ' + d.res1 + '. ' +
+      'Volumen ' + d.volSig + '.\n\n' +
+      '📍 MITTELFRISTIG (3-7 Tage): 7T-Performance ' + (parseFloat(d.p7d)>=0?'+':'') + d.p7d + '%. ' +
+      'Nächstes Ziel: ' + d.res1 + ' / ' + d.res2 + '.\n\n' +
+      '⚡ EMPFEHLUNG: ' + sig.text + ' | Einstieg: ' + d.entryLong + ' | Stop: ' + d.stop + ' | TP1: ' + d.tp1 + '\n\n' +
+      '(KI-Analyse nicht verfügbar – lokale Fallback-Analyse)';
+  }
 }
 
 // ======================================================
@@ -2600,79 +2649,44 @@ window.addEventListener('resize', () => {
 const USERS = { admin: 'Admin1' };
 
 function doLogin() {
-  try {
-    var user = (document.getElementById('loginUser').value || '').trim();
-    var pass = document.getElementById('loginPass').value || '';
+  var user = (document.getElementById('loginUser').value || '').trim();
+  var pass = document.getElementById('loginPass').value || '';
+
+  if (USERS[user] && USERS[user] === pass) {
+    // Screen ausblenden
+    document.getElementById('loginScreen').style.display = 'none';
+    // Dashboard zeigen
+    document.getElementById('dashboardWrapper').style.display = 'block';
+    // Username
+    var badge = document.getElementById('userBadge');
+    if (badge) badge.textContent = user.toUpperCase();
+    // Analyse starten
+    try { initPortfolio(); } catch(e) {}
+    setTimeout(function() {
+      try { runAnalysis(); } catch(e) {}
+    }, 100);
+  } else {
     var errEl = document.getElementById('loginError');
-
-    if (USERS[user] && USERS[user] === pass) {
-      if (errEl) errEl.classList.remove('show');
-
-      // Login-Screen per Klasse ausblenden (sicherer als style.display)
-      var screen = document.getElementById('loginScreen');
-      screen.classList.add('hidden');
-
-      // Dashboard einblenden
-      var wrapper = document.getElementById('dashboardWrapper');
-      wrapper.style.display = 'block';
-      wrapper.style.opacity = '0';
-      wrapper.style.transition = 'opacity 0.4s ease';
-      setTimeout(function() { wrapper.style.opacity = '1'; }, 30);
-
-      // Username setzen
-      var badge = document.getElementById('userBadge');
-      if (badge) badge.innerHTML = '<span class="user-dot"></span>' + user.toUpperCase();
-
-      // Portfolio initialisieren
-      try { initPortfolio(); } catch(e) { console.warn('initPortfolio:', e); }
-
-      // Analyse nach kurzem Delay starten
-      setTimeout(function() {
-        try { runAnalysis(); } catch(e) { console.warn('runAnalysis:', e); }
-        try {
-          fetchAllTickerPrices().then(function(tickers) {
-            if (!tickers) return;
-            Object.keys(COINGECKO_IDS).forEach(function(sym) {
-              var id = COINGECKO_IDS[sym];
-              var data = tickers[id];
-              if (!data) return;
-              var chg = data.usd_24h_change ? data.usd_24h_change.toFixed(2) : null;
-              if (chg) updateTickerPrice(sym, fmtPrice(data.usd), chg);
-            });
-          }).catch(function() {});
-        } catch(e) {}
-      }, 300);
-
-    } else {
-      if (errEl) { errEl.classList.remove('show'); void errEl.offsetWidth; errEl.classList.add('show'); }
-      var passEl = document.getElementById('loginPass');
-      if (passEl) { passEl.value = ''; passEl.focus(); }
+    if (errEl) {
+      errEl.classList.remove('show');
+      void errEl.offsetWidth;
+      errEl.classList.add('show');
     }
-  } catch(e) {
-    console.error('doLogin Fehler:', e);
+    var passEl = document.getElementById('loginPass');
+    if (passEl) { passEl.value = ''; passEl.focus(); }
   }
 }
 
 function doLogout() {
-  try {
-    clearTimeout(window._priceRefreshTimer);
-    var wrapper = document.getElementById('dashboardWrapper');
-    wrapper.style.transition = 'opacity 0.4s ease';
-    wrapper.style.opacity = '0';
-    setTimeout(function() {
-      wrapper.style.display = 'none';
-      var screen = document.getElementById('loginScreen');
-      screen.classList.remove('hidden');
-      screen.style.opacity = '0';
-      screen.style.transition = 'opacity 0.4s ease';
-      setTimeout(function() { screen.style.opacity = '1'; }, 30);
-      document.getElementById('loginUser').value = '';
-      document.getElementById('loginPass').value = '';
-      var err = document.getElementById('loginError');
-      if (err) err.classList.remove('show');
-    }, 400);
-  } catch(e) { console.warn('doLogout:', e); }
+  document.getElementById('dashboardWrapper').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  var err = document.getElementById('loginError');
+  if (err) err.classList.remove('show');
+  clearTimeout(window._priceRefreshTimer);
 }
+
 
 
 // ════════════════════════════════════════
@@ -2919,17 +2933,23 @@ RISIKO-HINWEIS:
 
 Maximal 280 Wörter. Keine allgemeinen Floskeln. Beziehe dich immer auf die konkreten RSI/MACD-Werte.`;
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-  const data = await response.json();
-  return data.content?.[0]?.text || null;
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5-20250929',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!response.ok) throw new Error('API ' + response.status);
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.content?.[0]?.text || null;
+  } catch(e) {
+    return null; // Fallback: nur lokale Analyse zeigen
+  }
 }
 
 // ── Ergebnisse rendern ──
@@ -3104,7 +3124,6 @@ document.head.appendChild(spinStyle);
 // Globaler Fehler-Auffänger
 window.onerror = function(msg, src, line, col, err) {
 console.error(‘Global JS Error:’, msg, ‘Zeile:’, line, err);
-// Overlay immer schließen falls offen
 var ov = document.getElementById(‘loadingOverlay’);
 var btn = document.getElementById(‘analyzeBtn’);
 if (ov) ov.classList.remove(‘active’);
@@ -3112,16 +3131,40 @@ if (btn) btn.disabled = false;
 return false;
 };
 
-// Enter key support
+// Alles nach DOM-Laden initialisieren
 document.addEventListener(‘DOMContentLoaded’, function() {
-try {
-[‘loginUser’,‘loginPass’].forEach(function(id) {
+
+// coinSelect Change-Handler
+var coinSel = document.getElementById(‘coinSelect’);
+if (coinSel) {
+coinSel.addEventListener(‘change’, function() {
+var sym = this.value;
+document.querySelectorAll(’.chip’).forEach(function(c) {
+c.classList.toggle(‘active’, c.textContent === sym);
+});
+});
+}
+
+// Login-Button (Backup falls onclick nicht greift)
+var loginBtn = document.getElementById(‘loginBtn’);
+if (loginBtn && !loginBtn._bound) {
+loginBtn._bound = true;
+loginBtn.addEventListener(‘click’, function(e) {
+e.preventDefault();
+doLogin();
+});
+}
+
+// Enter-Taste in Login-Feldern
+[‘loginUser’, ‘loginPass’].forEach(function(id) {
 var el = document.getElementById(id);
-if (el) el.addEventListener(‘keydown’, function(e) {
-if (e.key === ‘Enter’) doLogin();
+if (el) {
+el.addEventListener(‘keydown’, function(e) {
+if (e.key === ‘Enter’) { e.preventDefault(); doLogin(); }
 });
+}
 });
-} catch(e) { console.warn(‘DOMContentLoaded:’, e); }
+
 });
 
 // Clock
