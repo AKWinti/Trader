@@ -897,8 +897,8 @@ grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px;
 <!-- NAV TABS -->
 
 <div class="nav-tabs" id="navTabs">
-  <button class="nav-tab active" onclick="switchPage('dashboard')">⚡ DASHBOARD</button>
-  <button class="nav-tab" onclick="switchPage('portfolio')">◈ PORTFOLIO ADVISOR</button>
+  <button class="nav-tab active" onclick="switchPage('dashboard', this)">⚡ DASHBOARD</button>
+  <button class="nav-tab" onclick="switchPage('portfolio', this)">◈ PORTFOLIO ADVISOR</button>
 </div>
 
 <!-- ====== PAGE: DASHBOARD ====== -->
@@ -2594,98 +2594,92 @@ window.addEventListener('resize', () => {
 const USERS = { admin: 'Admin1' };
 
 function doLogin() {
-  const user = document.getElementById('loginUser').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  const err  = document.getElementById('loginError');
+  try {
+    const user = (document.getElementById('loginUser').value || '').trim();
+    const pass = document.getElementById('loginPass').value || '';
+    const err  = document.getElementById('loginError');
 
-  if (USERS[user] && USERS[user] === pass) {
-    // Success
-    const screen = document.getElementById('loginScreen');
-    screen.style.opacity = '1';
-    screen.style.transition = 'opacity 0.5s ease';
-    setTimeout(() => { screen.style.opacity = '0'; }, 50);
-    setTimeout(() => {
-      screen.classList.add('login-screen-hidden');
-      const wrapper = document.getElementById('dashboardWrapper');
-      wrapper.style.display = 'block';
-      wrapper.style.opacity = '0';
-      wrapper.style.transition = 'opacity 0.5s ease';
-      setTimeout(() => { wrapper.style.opacity = '1'; }, 50);
-      // Show username in header
-      document.getElementById('userBadge').innerHTML =
-        `<span class="user-dot"></span>${user.toUpperCase()}`;
-      // Ticker sofort mit Live-Preisen befüllen
-      fetchAllTickerPrices().then(tickers => {
-        if (!tickers) return;
-        Object.entries(COINGECKO_IDS).forEach(([sym, id]) => {
-          const data = tickers[id];
-          if (!data) return;
-          const price = fmtPrice(data.usd);
-          const chg   = data.usd_24h_change ? data.usd_24h_change.toFixed(2) : null;
-          if (chg) updateTickerPrice(sym, price, chg);
-        });
-      });
-      // Gesamt-Marktcap live vom Global-Endpunkt
-      fetch('https://api.coingecko.com/api/v3/global')
-        .then(r => r.json()).then(g => {
-          const mcap = g.data?.total_market_cap?.usd;
-          if (mcap) {
-            document.querySelectorAll('.ticker-item').forEach(item => {
-              const s = item.querySelector('.tk-sym');
-              if (s && s.textContent === 'MARKTCAP GESAMT')
-                item.querySelectorAll('span')[1].textContent = fmtMarketCap(mcap);
-            });
-          }
-        }).catch(() => {});
-      // Fear & Greed live
-      fetchFearGreed().then(fg => {
-        if (!fg) return;
-        document.querySelectorAll('.ticker-item').forEach(item => {
-          const s = item.querySelector('.tk-sym');
-          if (s && s.textContent === 'FEAR & GREED') {
-            const sp = item.querySelectorAll('span')[1];
-            sp.textContent = `${fg.value} – ${fg.label.toUpperCase()}`;
-            sp.style.color = fg.value < 40 ? 'var(--red)' : fg.value < 60 ? 'var(--yellow)' : 'var(--green)';
-          }
-        });
-        // Auch Fear&Greed Widget updaten
-        const n = document.getElementById('fearNeedle');
-        const sc = document.getElementById('fearScore');
-        const lb = document.getElementById('fearLabel');
-        if (n) n.style.left = fg.value + '%';
-        if (sc) { sc.textContent = fg.value; sc.style.color = fg.value < 40 ? 'var(--red)' : fg.value < 60 ? 'var(--yellow)' : 'var(--green)'; }
-        if (lb) lb.textContent = fg.label.toUpperCase();
-      });
-      // Start analysis + init portfolio
-      runAnalysis();
-      initPortfolio();
-    }, 500);
-    err.classList.remove('show');
-  } else {
-    // Error
-    err.classList.remove('show');
-    void err.offsetWidth; // reflow for animation replay
-    err.classList.add('show');
-    document.getElementById('loginPass').value = '';
-    document.getElementById('loginPass').focus();
+    if (USERS[user] && USERS[user] === pass) {
+      err.classList.remove('show');
+
+      // 1. Login-Screen ausblenden
+      const screen = document.getElementById('loginScreen');
+      screen.style.transition = 'opacity 0.4s ease';
+      screen.style.opacity = '0';
+
+      setTimeout(function() {
+        // 2. Login-Screen verstecken
+        screen.style.display = 'none';
+
+        // 3. Dashboard einblenden
+        const wrapper = document.getElementById('dashboardWrapper');
+        wrapper.style.display = 'block';
+        wrapper.style.opacity = '0';
+        wrapper.style.transition = 'opacity 0.4s ease';
+        setTimeout(function() { wrapper.style.opacity = '1'; }, 30);
+
+        // 4. Username setzen
+        var badge = document.getElementById('userBadge');
+        if (badge) badge.innerHTML = '<span class="user-dot"></span>' + user.toUpperCase();
+
+        // 5. Portfolio initialisieren
+        try { initPortfolio(); } catch(e) { console.warn('initPortfolio:', e); }
+
+        // 6. Analyse starten (nach kurzem Delay damit DOM bereit ist)
+        setTimeout(function() {
+          try { runAnalysis(); } catch(e) { console.warn('runAnalysis:', e); }
+          // Ticker im Hintergrund
+          try {
+            fetchAllTickerPrices().then(function(tickers) {
+              if (!tickers) return;
+              Object.entries(COINGECKO_IDS).forEach(function(entry) {
+                var sym = entry[0], id = entry[1];
+                var data = tickers[id];
+                if (!data) return;
+                updateTickerPrice(sym, fmtPrice(data.usd),
+                  data.usd_24h_change ? data.usd_24h_change.toFixed(2) : null);
+              });
+            }).catch(function(){});
+          } catch(e) {}
+        }, 200);
+
+      }, 450);
+
+    } else {
+      // Falsches Passwort
+      var err2 = document.getElementById('loginError');
+      if (err2) {
+        err2.classList.remove('show');
+        void err2.offsetWidth;
+        err2.classList.add('show');
+      }
+      document.getElementById('loginPass').value = '';
+      document.getElementById('loginPass').focus();
+    }
+  } catch(e) {
+    console.error('doLogin Fehler:', e);
   }
 }
 
 function doLogout() {
-  const wrapper = document.getElementById('dashboardWrapper');
-  wrapper.style.transition = 'opacity 0.4s ease';
-  wrapper.style.opacity = '0';
-  setTimeout(() => {
-    wrapper.style.display = 'none';
-    const screen = document.getElementById('loginScreen');
-    screen.classList.remove('login-screen-hidden');
-    screen.style.opacity = '0';
-    screen.style.transition = 'opacity 0.4s ease';
-    setTimeout(() => { screen.style.opacity = '1'; }, 50);
-    document.getElementById('loginUser').value = '';
-    document.getElementById('loginPass').value = '';
-    document.getElementById('loginError').classList.remove('show');
-  }, 400);
+  try {
+    clearTimeout(window._priceRefreshTimer);
+    const wrapper = document.getElementById('dashboardWrapper');
+    wrapper.style.transition = 'opacity 0.4s ease';
+    wrapper.style.opacity = '0';
+    setTimeout(function() {
+      wrapper.style.display = 'none';
+      const screen = document.getElementById('loginScreen');
+      screen.style.display = '';
+      screen.style.opacity = '0';
+      screen.style.transition = 'opacity 0.4s ease';
+      setTimeout(function() { screen.style.opacity = '1'; }, 30);
+      document.getElementById('loginUser').value = '';
+      document.getElementById('loginPass').value = '';
+      var err = document.getElementById('loginError');
+      if (err) err.classList.remove('show');
+    }, 420);
+  } catch(e) { console.warn('doLogout:', e); }
 }
 
 // ════════════════════════════════════════
@@ -2700,11 +2694,13 @@ const ALL_COINS = [
   'ARB','OP','SUI','SHIB','PEPE','FLOKI'
 ];
 
-function switchPage(page) {
+function switchPage(page, tabEl) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
-  event.target.classList.add('active');
+  const pageId = 'page' + page.charAt(0).toUpperCase() + page.slice(1);
+  const pageEl = document.getElementById(pageId);
+  if (pageEl) pageEl.classList.add('active');
+  if (tabEl) tabEl.classList.add('active');
 }
 
 function setHorizon(days) {
@@ -3112,13 +3108,27 @@ const spinStyle = document.createElement(‘style’);
 spinStyle.textContent = ‘@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}’;
 document.head.appendChild(spinStyle);
 
+// Globaler Fehler-Auffänger
+window.onerror = function(msg, src, line, col, err) {
+console.error(‘Global JS Error:’, msg, ‘Zeile:’, line, err);
+// Overlay immer schließen falls offen
+var ov = document.getElementById(‘loadingOverlay’);
+var btn = document.getElementById(‘analyzeBtn’);
+if (ov) ov.classList.remove(‘active’);
+if (btn) btn.disabled = false;
+return false;
+};
+
 // Enter key support
-document.addEventListener(‘DOMContentLoaded’, () => {
-[‘loginUser’,‘loginPass’].forEach(id => {
-document.getElementById(id).addEventListener(‘keydown’, e => {
+document.addEventListener(‘DOMContentLoaded’, function() {
+try {
+[‘loginUser’,‘loginPass’].forEach(function(id) {
+var el = document.getElementById(id);
+if (el) el.addEventListener(‘keydown’, function(e) {
 if (e.key === ‘Enter’) doLogin();
 });
 });
+} catch(e) { console.warn(‘DOMContentLoaded:’, e); }
 });
 
 // Clock
