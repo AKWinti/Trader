@@ -268,3 +268,119 @@ header {
 .login-error.show {
   display: block;
 }
+
+/* ================= SELECTOR BAR ================= */
+
+.selector-bar {
+  margin-top: 24px;
+  background: #080f1e;
+  border: 1px solid #0d2a45;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.selector-label {
+  font-size: 12px;
+  color: #4a6080;
+}
+
+.coin-select {
+  background: #040810;
+  border: 1px solid #0d2a45;
+  color: #c8deff;
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+
+.analyze-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg,#00d4ff,#00ff88);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ================= PRICE HERO ================= */
+
+.price-hero {
+  margin-top: 22px;
+  display: flex;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.current-price {
+  flex: 1;
+  background: #080f1e;
+  border: 1px solid #0d2a45;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.price-label {
+  font-size: 12px;
+  color: #4a6080;
+}
+
+.price-value {
+  font-size: 42px;
+  font-family: 'Share Tech Mono', monospace;
+  margin-top: 6px;
+  color: #00d4ff;
+}
+
+.price-change {
+  margin-top: 6px;
+  font-size: 16px;
+}
+
+.price-change.up { color: #00ff88; }
+.price-change.down { color: #ff3a3a; }
+
+/* ================= SIGNAL BOX ================= */
+
+.signal-box {
+  width: 220px;
+  border-radius: 14px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid #0d2a45;
+}
+
+.signal-label {
+  font-size: 12px;
+  color: #4a6080;
+}
+
+.signal-value {
+  font-size: 28px;
+  font-family: 'Orbitron', sans-serif;
+  margin-top: 6px;
+}
+
+.signal-sub {
+  font-size: 11px;
+  color: #4a6080;
+  margin-top: 4px;
+}
+
+/* Signal Farben */
+
+.signal-box.buy {
+  background: rgba(0,255,136,0.08);
+  border-color: #00ff88;
+}
+
+.signal-box.sell {
+  background: rgba(255,58,58,0.08);
+  border-color: #ff3a3a;
+}
+
+.signal-box.neutral {
+  background: rgba(255,215,0,0.08);
+  border-color: #ffd700;
+}
