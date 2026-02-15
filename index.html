@@ -49,51 +49,41 @@
 
 
 <!-- ===== SCRIPT ===== -->
-<script type="module">
-import { fetchBinancePrices } from "./src/api/binance.js";
-
+<script>
 const grid = document.getElementById("coinGrid");
-const timeEl = document.getElementById("timestamp");
-
-function updateTime() {
-  const now = new Date();
-  timeEl.textContent = now.toLocaleTimeString();
-}
-setInterval(updateTime, 1000);
-updateTime();
-
-function createCard(coin) {
-  const changeClass = coin.change >= 0 ? "up" : "down";
-
-  const el = document.createElement("div");
-  el.className = "card";
-  el.innerHTML = `
-    <div class="symbol">${coin.symbol}</div>
-    <div class="price">$ ${Number(coin.price).toLocaleString()}</div>
-    <div class="${changeClass}">
-      ${coin.change >= 0 ? "+" : ""}${coin.change}%
-    </div>
-  `;
-  return el;
-}
 
 async function loadData() {
-  try {
-    const data = await fetchBinancePrices();
 
-    grid.innerHTML = "";
+  const res = await fetch("https://api.binance.com/api/v3/ticker/24hr");
+  const data = await res.json();
 
-    data.slice(0, 12).forEach(coin => {
-      grid.appendChild(createCard(coin));
+  grid.innerHTML = "";
+
+  data
+    .filter(c => c.symbol.endsWith("USDT"))
+    .slice(0, 12)
+    .forEach(c => {
+
+      const change = parseFloat(c.priceChangePercent);
+      const changeClass = change >= 0 ? "up" : "down";
+
+      const el = document.createElement("div");
+      el.className = "card";
+      el.innerHTML = `
+        <div class="symbol">${c.symbol.replace("USDT","")}</div>
+        <div class="price">$ ${Number(c.lastPrice).toLocaleString()}</div>
+        <div class="${changeClass}">
+          ${change >= 0 ? "+" : ""}${change.toFixed(2)}%
+        </div>
+      `;
+
+      grid.appendChild(el);
     });
-
-  } catch (e) {
-    console.error("Fehler beim Laden:", e);
-  }
 }
 
 loadData();
 setInterval(loadData, 15000);
+</script>
 </script>
 
 </body>
