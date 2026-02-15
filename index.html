@@ -1047,6 +1047,54 @@ const SIGNAL_LABELS = {
 
 let currentCoin = 'XRP';
 
+// CoinGecko IDs für alle Coins
+const COINGECKO_IDS = {
+  BTC:'bitcoin', ETH:'ethereum', XRP:'ripple', BNB:'binancecoin',
+  SOL:'solana', ADA:'cardano', AVAX:'avalanche-2', DOGE:'dogecoin',
+  DOT:'polkadot', LINK:'chainlink', MATIC:'matic-network', UNI:'uniswap',
+  ATOM:'cosmos', LTC:'litecoin', NEAR:'near', ARB:'arbitrum',
+  OP:'optimism', SUI:'sui', SHIB:'shiba-inu', PEPE:'pepe', FLOKI:'floki',
+};
+
+// Live-Preis von CoinGecko holen
+async function fetchLivePrice(sym) {
+  const id = COINGECKO_IDS[sym];
+  if (!id) return null;
+  try {
+    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_high_low_24h=true`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const json = await res.json();
+    const data = json[id];
+    if (!data) return null;
+    return {
+      price: data.usd,
+      change24h: data.usd_24h_change,
+      high24h: data.usd_24h_high,
+      low24h: data.usd_24h_low,
+      vol24h: data.usd_24h_vol,
+    };
+  } catch(e) { return null; }
+}
+
+// Preis schön formatieren
+function fmtPrice(p) {
+  if (!p && p !== 0) return '–';
+  if (p >= 10000)      return '$' + p.toLocaleString('de-DE', {maximumFractionDigits: 0});
+  if (p >= 1000)       return '$' + p.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  if (p >= 1)          return '$' + p.toFixed(4);
+  if (p >= 0.01)       return '$' + p.toFixed(4);
+  if (p >= 0.0001)     return '$' + p.toFixed(6);
+  return '$' + p.toFixed(8);
+}
+
+function fmtVol(v) {
+  if (!v) return '–';
+  if (v >= 1e9) return '$' + (v/1e9).toFixed(2) + ' Mrd';
+  if (v >= 1e6) return '$' + (v/1e6).toFixed(1) + ' Mio';
+  return '$' + v.toFixed(0);
+}
+
 function quickSelect(sym) {
   document.getElementById('coinSelect').value = sym;
   document.querySelectorAll('.chip').forEach(c => {
@@ -1073,27 +1121,103 @@ async function runAnalysis() {
   const sub = document.getElementById('loadingSub');
   btn.disabled = true;
   overlay.classList.add('active');
-  sub.textContent = `${d.name} (${sym}) wird analysiert...`;
+  sub.textContent = `Live-Kurs für ${d.name} (${sym}) wird geladen...`;
 
-  // Update static parts immediately
+  // 1. Live-Preis holen
+  const live = await fetchLivePrice(sym);
+  if (live) {
+    // Echte Werte in COIN_DATA einpflegen
+    d.price  = fmtPrice(live.price);
+    d.cur    = fmtPrice(live.price);
+    d.change = live.change24h ? live.change24h.toFixed(2) : d.change;
+    d.h24    = fmtPrice(live.high24h);
+    d.l24    = fmtPrice(live.low24h);
+    d.vol    = fmtVol(live.vol24h);
+    // Support/Widerstand dynamisch aus Live-Preis ableiten
+    const p = live.price;
+    d.sup1   = fmtPrice(p * 0.93);
+    d.sup2   = fmtPrice(p * 0.82);
+    d.res1   = fmtPrice(p * 1.05);
+    d.res2   = fmtPrice(p * 1.15);
+    d.cur    = fmtPrice(p);
+    d.entryLong = fmtPrice(p * 1.02) + '–' + fmtPrice(p * 1.04);
+    d.stop   = fmtPrice(p * 0.94);
+    d.tp1    = fmtPrice(p * 1.06);
+    d.tp2    = fmtPrice(p * 1.12) + '–' + fmtPrice(p * 1.18);
+    // Signal aus 24h-Change ableiten
+    const chg = live.change24h || 0;
+    d.signal = chg > 3 ? 'buy' : chg < -3 ? 'sell' : 'neutral';
+    sub.textContent = `✓ Live-Kurs: ${d.price} | KI analysiert...`;
+  } else {
+    sub.textContent = `Kein Live-Kurs (Fallback) | KI analysiert ${d.name}...`;
+  }
+
+  // 2. UI sofort updaten
   updateStaticUI(sym, d);
 
-  // Get AI analysis
+  // 3. Ticker updaten
+  updateTickerPrice(sym, d.price, d.change);
+
+  // 4. KI-Analyse holen
   try {
     sub.textContent = 'Claude KI generiert Analyse...';
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('de-DE', {day:'2-digit', month:'long', year:'numeric'});
     const analysis = await getAIAnalysis(sym, d);
     document.getElementById('aiBody').textContent = analysis;
     document.getElementById('aiTitle').textContent =
-      `${d.name.toUpperCase()} (${sym}) – DAYTRADER ANALYSE · 15. FEB 2026`;
+      `${d.name.toUpperCase()} (${sym}) – DAYTRADER ANALYSE · ${dateStr.toUpperCase()}`;
   } catch(e) {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('de-DE', {day:'2-digit', month:'long', year:'numeric'});
     document.getElementById('aiTitle').textContent =
-      `${d.name.toUpperCase()} (${sym}) – ANALYSE · 15. FEB 2026`;
+      `${d.name.toUpperCase()} (${sym}) – ANALYSE · ${dateStr.toUpperCase()}`;
     document.getElementById('aiBody').textContent =
       `Analyse für ${d.name} (${sym}):\n\nAktueller Kurs: ${d.price} (${parseFloat(d.change) >= 0 ? '+':''}${d.change}%)\n\nSignal: ${SIGNAL_LABELS[d.signal].text} – Konfidenz ${d.conf}%\n\nRSI: ${d.rsi} | MACD: ${d.macd}\nSupport: ${d.sup1} / ${d.sup2}\nWiderstand: ${d.res1} / ${d.res2}\n\n📍 KURZFRISTIG: Beobachte Zone ${d.res1} als Schlüsselwiderstand.\n📍 MITTELFRISTIG: Support bei ${d.sup1} muss halten.\n⚡ EMPFEHLUNG: Einstieg bei ${d.entryLong} · Stop: ${d.stop} · TP: ${d.tp1}`;
   }
 
   overlay.classList.remove('active');
   btn.disabled = false;
+
+  // 5. Auto-Refresh alle 60 Sekunden
+  clearTimeout(window._priceRefreshTimer);
+  window._priceRefreshTimer = setTimeout(async () => {
+    const fresh = await fetchLivePrice(sym);
+    if (fresh && sym === currentCoin) {
+      COIN_DATA[sym].price  = fmtPrice(fresh.price);
+      COIN_DATA[sym].change = fresh.change24h ? fresh.change24h.toFixed(2) : COIN_DATA[sym].change;
+      COIN_DATA[sym].h24    = fmtPrice(fresh.high24h);
+      COIN_DATA[sym].l24    = fmtPrice(fresh.low24h);
+      // Nur Preis-Elemente leise updaten (kein reload)
+      document.getElementById('priceValue').textContent = COIN_DATA[sym].price;
+      const chg2 = parseFloat(COIN_DATA[sym].change);
+      const chgEl2 = document.getElementById('priceChange');
+      chgEl2.textContent = `${chg2 >= 0 ? '▲ +' : '▼ '}${COIN_DATA[sym].change}% (24H)`;
+      chgEl2.className = 'price-change ' + (chg2 >= 0 ? 'up' : 'down');
+      document.getElementById('chartLivePrice').textContent = COIN_DATA[sym].price;
+      const chgEl3 = document.getElementById('chartLiveChange');
+      chgEl3.textContent = (chg2 >= 0 ? '▲ +' : '▼ ') + COIN_DATA[sym].change + '%';
+      chgEl3.className = chg2 >= 0 ? 'up' : 'down';
+      updateTickerPrice(sym, COIN_DATA[sym].price, COIN_DATA[sym].change);
+    }
+  }, 60000);
+}
+
+function updateTickerPrice(sym, price, change) {
+  // Ticker-Eintrag für diesen Coin live updaten
+  const chg = parseFloat(change);
+  const tickerItems = document.querySelectorAll('.ticker-item');
+  tickerItems.forEach(item => {
+    const symEl = item.querySelector('.tk-sym');
+    if (symEl && symEl.textContent === sym) {
+      const spans = item.querySelectorAll('span');
+      if (spans[1]) spans[1].textContent = price;
+      if (spans[2]) {
+        spans[2].textContent = (chg >= 0 ? '▲ +' : '▼ ') + Math.abs(chg).toFixed(2) + '%';
+        spans[2].className = chg >= 0 ? 'tk-up' : 'tk-down';
+      }
+    }
+  });
 }
 
 function updateStaticUI(sym, d) {
@@ -1278,9 +1402,11 @@ function updateStaticUI(sym, d) {
 }
 
 async function getAIAnalysis(sym, d) {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('de-DE', {day:'2-digit', month:'long', year:'numeric'});
   const prompt = `Du bist ein professioneller Krypto-Analyst mit Fokus auf Daytrading. Erstelle eine präzise, professionelle Kurzanalyse für ${d.name} (${sym}) auf Deutsch.
 
-Aktuelle Marktdaten (15. Februar 2026):
+Aktuelle Marktdaten (${dateStr}):
 - Kurs: ${d.price} | 24H: ${d.change}% | 7T: ${d.p7d}% | 30T: ${d.p30d}%
 - RSI (14): ${d.rsi} | MACD: ${d.macd} | Williams %R: ${d.williams}
 - MA5: ${d.ma5} | MA50: ${d.ma50} | Volumen 24H: ${d.vol}
