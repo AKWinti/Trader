@@ -480,6 +480,12 @@ display: flex;
 align-items: center;
 justify-content: center;
 flex-direction: column;
+transition: opacity 0.4s ease;
+}
+#loginScreen.hidden {
+opacity: 0 !important;
+pointer-events: none !important;
+display: none !important;
 }
 #loginScreen::before {
 content:’’;
@@ -2595,66 +2601,52 @@ const USERS = { admin: 'Admin1' };
 
 function doLogin() {
   try {
-    const user = (document.getElementById('loginUser').value || '').trim();
-    const pass = document.getElementById('loginPass').value || '';
-    const err  = document.getElementById('loginError');
+    var user = (document.getElementById('loginUser').value || '').trim();
+    var pass = document.getElementById('loginPass').value || '';
+    var errEl = document.getElementById('loginError');
 
     if (USERS[user] && USERS[user] === pass) {
-      err.classList.remove('show');
+      if (errEl) errEl.classList.remove('show');
 
-      // 1. Login-Screen ausblenden
-      const screen = document.getElementById('loginScreen');
-      screen.style.transition = 'opacity 0.4s ease';
-      screen.style.opacity = '0';
+      // Login-Screen per Klasse ausblenden (sicherer als style.display)
+      var screen = document.getElementById('loginScreen');
+      screen.classList.add('hidden');
 
+      // Dashboard einblenden
+      var wrapper = document.getElementById('dashboardWrapper');
+      wrapper.style.display = 'block';
+      wrapper.style.opacity = '0';
+      wrapper.style.transition = 'opacity 0.4s ease';
+      setTimeout(function() { wrapper.style.opacity = '1'; }, 30);
+
+      // Username setzen
+      var badge = document.getElementById('userBadge');
+      if (badge) badge.innerHTML = '<span class="user-dot"></span>' + user.toUpperCase();
+
+      // Portfolio initialisieren
+      try { initPortfolio(); } catch(e) { console.warn('initPortfolio:', e); }
+
+      // Analyse nach kurzem Delay starten
       setTimeout(function() {
-        // 2. Login-Screen verstecken
-        screen.style.display = 'none';
-
-        // 3. Dashboard einblenden
-        const wrapper = document.getElementById('dashboardWrapper');
-        wrapper.style.display = 'block';
-        wrapper.style.opacity = '0';
-        wrapper.style.transition = 'opacity 0.4s ease';
-        setTimeout(function() { wrapper.style.opacity = '1'; }, 30);
-
-        // 4. Username setzen
-        var badge = document.getElementById('userBadge');
-        if (badge) badge.innerHTML = '<span class="user-dot"></span>' + user.toUpperCase();
-
-        // 5. Portfolio initialisieren
-        try { initPortfolio(); } catch(e) { console.warn('initPortfolio:', e); }
-
-        // 6. Analyse starten (nach kurzem Delay damit DOM bereit ist)
-        setTimeout(function() {
-          try { runAnalysis(); } catch(e) { console.warn('runAnalysis:', e); }
-          // Ticker im Hintergrund
-          try {
-            fetchAllTickerPrices().then(function(tickers) {
-              if (!tickers) return;
-              Object.entries(COINGECKO_IDS).forEach(function(entry) {
-                var sym = entry[0], id = entry[1];
-                var data = tickers[id];
-                if (!data) return;
-                updateTickerPrice(sym, fmtPrice(data.usd),
-                  data.usd_24h_change ? data.usd_24h_change.toFixed(2) : null);
-              });
-            }).catch(function(){});
-          } catch(e) {}
-        }, 200);
-
-      }, 450);
+        try { runAnalysis(); } catch(e) { console.warn('runAnalysis:', e); }
+        try {
+          fetchAllTickerPrices().then(function(tickers) {
+            if (!tickers) return;
+            Object.keys(COINGECKO_IDS).forEach(function(sym) {
+              var id = COINGECKO_IDS[sym];
+              var data = tickers[id];
+              if (!data) return;
+              var chg = data.usd_24h_change ? data.usd_24h_change.toFixed(2) : null;
+              if (chg) updateTickerPrice(sym, fmtPrice(data.usd), chg);
+            });
+          }).catch(function() {});
+        } catch(e) {}
+      }, 300);
 
     } else {
-      // Falsches Passwort
-      var err2 = document.getElementById('loginError');
-      if (err2) {
-        err2.classList.remove('show');
-        void err2.offsetWidth;
-        err2.classList.add('show');
-      }
-      document.getElementById('loginPass').value = '';
-      document.getElementById('loginPass').focus();
+      if (errEl) { errEl.classList.remove('show'); void errEl.offsetWidth; errEl.classList.add('show'); }
+      var passEl = document.getElementById('loginPass');
+      if (passEl) { passEl.value = ''; passEl.focus(); }
     }
   } catch(e) {
     console.error('doLogin Fehler:', e);
@@ -2664,13 +2656,13 @@ function doLogin() {
 function doLogout() {
   try {
     clearTimeout(window._priceRefreshTimer);
-    const wrapper = document.getElementById('dashboardWrapper');
+    var wrapper = document.getElementById('dashboardWrapper');
     wrapper.style.transition = 'opacity 0.4s ease';
     wrapper.style.opacity = '0';
     setTimeout(function() {
       wrapper.style.display = 'none';
-      const screen = document.getElementById('loginScreen');
-      screen.style.display = '';
+      var screen = document.getElementById('loginScreen');
+      screen.classList.remove('hidden');
       screen.style.opacity = '0';
       screen.style.transition = 'opacity 0.4s ease';
       setTimeout(function() { screen.style.opacity = '1'; }, 30);
@@ -2678,9 +2670,10 @@ function doLogout() {
       document.getElementById('loginPass').value = '';
       var err = document.getElementById('loginError');
       if (err) err.classList.remove('show');
-    }, 420);
+    }, 400);
   } catch(e) { console.warn('doLogout:', e); }
 }
+
 
 // ════════════════════════════════════════
 // PORTFOLIO ADVISOR
