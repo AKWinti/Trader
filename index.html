@@ -1595,181 +1595,196 @@ async function runAnalysis() {
   const btn = document.getElementById('analyzeBtn');
   const overlay = document.getElementById('loadingOverlay');
   const sub = document.getElementById('loadingSub');
+
+  // Garantierter Escape nach 20 Sekunden – niemals einfrieren
+  const escapeTimer = setTimeout(() => {
+    overlay.classList.remove('active');
+    btn.disabled = false;
+  }, 20000);
+
   btn.disabled = true;
   overlay.classList.add('active');
   sub.textContent = `Lade Live-Daten für ${d.name} (${sym})...`;
 
-  // ── Alle APIs parallel abrufen ──
-  const [binanceTicker, binanceKlines, orderbook, cgData, fearGreed] = await Promise.all([
-    fetchBinanceTicker(sym),
-    fetchBinanceKlines(sym, '1h', 500),
-    fetchBinanceOrderbook(sym),
-    fetchLivePrice(sym),
-    fetchFearGreed(),
-  ]);
-
-  // ── 1. Kerndaten: Binance priorisieren ──
-  const ticker = binanceTicker || (cgData ? {
-    price: cgData.price, change24h: cgData.change24h,
-    high24h: cgData.high24h, low24h: cgData.low24h, vol24h: cgData.vol24h,
-  } : null);
-
-  if (ticker) {
-    const p = ticker.price;
-    d.price   = fmtPrice(p);
-    d.cur     = fmtPrice(p);
-    d.change  = ticker.change24h != null ? ticker.change24h.toFixed(2) : d.change;
-    d.h24     = fmtPrice(ticker.high24h);
-    d.l24     = fmtPrice(ticker.low24h);
-    d.vol     = fmtVol(ticker.vol24h);
-    sub.textContent = `✓ Binance: ${d.price} (${d.change}%) | Indikatoren...`;
-    if (binanceTicker?.trades) d._trades = binanceTicker.trades;
-  }
-
-  // ── 2. CoinGecko: 7d/30d + Marktcap ──
-  if (cgData) {
-    d.p7d  = cgData.change7d  != null ? cgData.change7d.toFixed(2)  : d.p7d;
-    d.p30d = cgData.change30d != null ? cgData.change30d.toFixed(2) : d.p30d;
-    d._marketCap = cgData.marketCap;
-  }
-
-  // ── 3. Technische Indikatoren aus Binance-Kerzen ──
-  const closes = binanceKlines ? binanceKlines.map(k => k.c) : (cgData?.sparkline || []);
-  const currentPrice = ticker?.price || parseFloat((d.price||'0').replace(/[$,]/g,'')) || 1;
-
-  if (closes.length >= 26) {
-    const rsi = calcRSI(closes, 14);
-    if (rsi !== null) { d.rsi = rsi.toFixed(2); d.rsiSig = rsi < 30 ? 'buy' : rsi > 70 ? 'sell' : 'neutral'; }
-
-    const macd = calcMACD(closes);
-    if (macd !== null) { d.macd = macd.toFixed(6); d.macdSig = macd > 0 ? 'buy' : 'sell'; }
-
-    const ma5  = calcSMA(closes, 5);
-    const ma50 = calcSMA(closes, Math.min(50, closes.length));
-    if (ma5)  { d.ma5  = fmtPrice(ma5);  d.ma5sig  = currentPrice > ma5  ? 'buy' : 'sell'; }
-    if (ma50) { d.ma50 = fmtPrice(ma50); d.ma50sig = currentPrice > ma50 ? 'buy' : 'sell'; }
-
-    const bb = calcBB(closes, 20);
-    if (bb !== null) d.bb = bb.toFixed(4);
-
-    const will = calcWilliams(closes, 14);
-    if (will !== null) { d.williams = will.toFixed(2); d.willSig = will < -80 ? 'buy' : will > -20 ? 'sell' : 'neutral'; }
-  }
-
-  // ── 4. Binance-Extras: ATR-Stop, echte S/R, Vol-Ratio ──
-  if (binanceKlines && binanceKlines.length >= 26) {
-    const p = currentPrice;
-    const atr = calcATR(binanceKlines, 14);
-    if (atr) {
-      d.stop      = fmtPrice(p - atr * 1.5);
-      d.tp1       = fmtPrice(p + atr * 2.0);
-      d.tp2       = fmtPrice(p + atr * 3.5) + '–' + fmtPrice(p + atr * 5.0);
-      d.entryLong = fmtPrice(p) + '–' + fmtPrice(p + atr * 0.5);
-    }
-    const volRatio = calcVolRatio(binanceKlines, 20);
-    if (volRatio !== null) {
-      d.volSig = volRatio > 1.8 ? 'hoch' : volRatio < 0.5 ? 'niedrig' : 'normal';
-      d._volRatio = volRatio.toFixed(2);
-    }
-    const recent48 = binanceKlines.slice(-48);
-    const week     = binanceKlines.slice(-168);
-    d.sup1 = fmtPrice(Math.min(...recent48.map(k => k.l)));
-    d.sup2 = fmtPrice(Math.min(...week.map(k => k.l)));
-    d.res1 = fmtPrice(Math.max(...recent48.map(k => k.h)));
-    d.res2 = fmtPrice(Math.max(...week.map(k => k.h)));
-    sub.textContent = `✓ RSI: ${d.rsi} | MACD: ${d.macd > 0 ? '+' : ''}${d.macd} | Vol: ${d.volSig}`;
-  }
-
-  // ── 5. Orderbook ──
-  if (orderbook) {
-    d._orderbook = orderbook;
-    if (orderbook.bestBid && orderbook.bestAsk) {
-      d._spread = ((orderbook.bestAsk - orderbook.bestBid) / orderbook.bestBid * 100).toFixed(3) + '%';
-    }
-  }
-
-  // ── 6. Signal (kombiniert) ──
-  const chgNum = parseFloat(d.change) || 0;
-  const rsiNum = parseFloat(d.rsi) || 50;
-  const obPressure = orderbook?.pressure || 'neutral';
-  let bullScore = 0;
-  if (rsiNum < 30) bullScore += 3; else if (rsiNum < 40) bullScore += 1;
-  else if (rsiNum > 70) bullScore -= 3; else if (rsiNum > 60) bullScore -= 1;
-  if (d.macdSig === 'buy') bullScore += 2; else if (d.macdSig === 'sell') bullScore -= 2;
-  if (obPressure === 'buy') bullScore += 1; else if (obPressure === 'sell') bullScore -= 1;
-  if (chgNum > 4) bullScore += 1; else if (chgNum < -4) bullScore -= 1;
-  d.signal = bullScore >= 3 ? 'buy' : bullScore <= -3 ? 'sell' : 'neutral';
-
-  // ── 7. Fear & Greed ──
-  if (fearGreed) {
-    d.fear = fearGreed.value;
-    const needle = document.getElementById('fearNeedle');
-    const scoreEl = document.getElementById('fearScore');
-    const labelEl = document.getElementById('fearLabel');
-    if (needle) needle.style.left = fearGreed.value + '%';
-    if (scoreEl) { scoreEl.textContent = fearGreed.value; scoreEl.style.color = fearGreed.value < 40 ? 'var(--red)' : fearGreed.value < 60 ? 'var(--yellow)' : 'var(--green)'; }
-    if (labelEl) labelEl.textContent = fearGreed.label.toUpperCase();
-    updateTickerMeta(fearGreed.value, fearGreed.label, null);
-  }
-
-  // ── 8. UI + Orderbook Widget ──
-  updateStaticUI(sym, d);
-  updateTickerPrice(sym, d.price, d.change);
-  if (orderbook) updateOrderbookWidget(orderbook, d);
-
-  // ── 9. KI-Analyse ──
   try {
-    sub.textContent = 'Claude KI generiert Analyse...';
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('de-DE', {day:'2-digit', month:'long', year:'numeric'});
-    const analysis = await getAIAnalysis(sym, d);
-    document.getElementById('aiBody').textContent = analysis;
-    document.getElementById('aiTitle').textContent =
-      `${d.name.toUpperCase()} (${sym}) – DAYTRADER ANALYSE · ${dateStr.toUpperCase()}`;
-  } catch(e) {
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('de-DE', {day:'2-digit', month:'long', year:'numeric'});
-    document.getElementById('aiTitle').textContent = `${d.name.toUpperCase()} (${sym}) – ANALYSE · ${dateStr.toUpperCase()}`;
-    document.getElementById('aiBody').textContent =
-      `${d.name} (${sym}) | Kurs: ${d.price} | RSI: ${d.rsi} | Signal: ${SIGNAL_LABELS[d.signal].text}\nSupport: ${d.sup1} | Widerstand: ${d.res1}\n⚡ Stop: ${d.stop} · TP1: ${d.tp1}`;
-  }
+    // ── Alle APIs parallel abrufen ──
+    const [binanceTicker, binanceKlines, orderbook, cgData, fearGreed] = await Promise.all([
+      fetchBinanceTicker(sym).catch(() => null),
+      fetchBinanceKlines(sym, '1h', 500).catch(() => null),
+      fetchBinanceOrderbook(sym).catch(() => null),
+      fetchLivePrice(sym).catch(() => null),
+      fetchFearGreed().catch(() => null),
+    ]);
 
-  overlay.classList.remove('active');
-  btn.disabled = false;
+    // ── 1. Kerndaten: Binance priorisieren ──
+    const ticker = binanceTicker || (cgData ? {
+      price: cgData.price, change24h: cgData.change24h,
+      high24h: cgData.high24h, low24h: cgData.low24h, vol24h: cgData.vol24h,
+    } : null);
+
+    if (ticker) {
+      const p = ticker.price;
+      d.price   = fmtPrice(p);
+      d.cur     = fmtPrice(p);
+      d.change  = ticker.change24h != null ? ticker.change24h.toFixed(2) : d.change;
+      d.h24     = fmtPrice(ticker.high24h);
+      d.l24     = fmtPrice(ticker.low24h);
+      d.vol     = fmtVol(ticker.vol24h);
+      sub.textContent = `✓ Binance: ${d.price} (${d.change}%) | Indikatoren...`;
+      if (binanceTicker?.trades) d._trades = binanceTicker.trades;
+    }
+
+    // ── 2. CoinGecko: 7d/30d + Marktcap ──
+    if (cgData) {
+      d.p7d  = cgData.change7d  != null ? cgData.change7d.toFixed(2)  : d.p7d;
+      d.p30d = cgData.change30d != null ? cgData.change30d.toFixed(2) : d.p30d;
+      d._marketCap = cgData.marketCap;
+    }
+
+    // ── 3. Technische Indikatoren aus Binance-Kerzen ──
+    const closes = binanceKlines ? binanceKlines.map(k => k.c) : (cgData?.sparkline || []);
+    const currentPrice = ticker?.price || parseFloat((d.price||'0').replace(/[$,]/g,'')) || 1;
+
+    if (closes.length >= 26) {
+      const rsi = calcRSI(closes, 14);
+      if (rsi !== null) { d.rsi = rsi.toFixed(2); d.rsiSig = rsi < 30 ? 'buy' : rsi > 70 ? 'sell' : 'neutral'; }
+      const macd = calcMACD(closes);
+      if (macd !== null) { d.macd = macd.toFixed(6); d.macdSig = macd > 0 ? 'buy' : 'sell'; }
+      const ma5  = calcSMA(closes, 5);
+      const ma50 = calcSMA(closes, Math.min(50, closes.length));
+      if (ma5)  { d.ma5  = fmtPrice(ma5);  d.ma5sig  = currentPrice > ma5  ? 'buy' : 'sell'; }
+      if (ma50) { d.ma50 = fmtPrice(ma50); d.ma50sig = currentPrice > ma50 ? 'buy' : 'sell'; }
+      const bb = calcBB(closes, 20);
+      if (bb !== null) d.bb = bb.toFixed(4);
+      const will = calcWilliams(closes, 14);
+      if (will !== null) { d.williams = will.toFixed(2); d.willSig = will < -80 ? 'buy' : will > -20 ? 'sell' : 'neutral'; }
+    }
+
+    // ── 4. Binance-Extras: ATR-Stop, echte S/R, Vol-Ratio ──
+    if (binanceKlines && binanceKlines.length >= 26) {
+      const p = currentPrice;
+      const atr = calcATR(binanceKlines, 14);
+      if (atr) {
+        d.stop      = fmtPrice(p - atr * 1.5);
+        d.tp1       = fmtPrice(p + atr * 2.0);
+        d.tp2       = fmtPrice(p + atr * 3.5) + '–' + fmtPrice(p + atr * 5.0);
+        d.entryLong = fmtPrice(p) + '–' + fmtPrice(p + atr * 0.5);
+      }
+      const volRatio = calcVolRatio(binanceKlines, 20);
+      if (volRatio !== null) {
+        d.volSig = volRatio > 1.8 ? 'hoch' : volRatio < 0.5 ? 'niedrig' : 'normal';
+        d._volRatio = volRatio.toFixed(2);
+      }
+      const recent48 = binanceKlines.slice(-48);
+      const week     = binanceKlines.slice(-168);
+      d.sup1 = fmtPrice(Math.min(...recent48.map(k => k.l)));
+      d.sup2 = fmtPrice(Math.min(...week.map(k => k.l)));
+      d.res1 = fmtPrice(Math.max(...recent48.map(k => k.h)));
+      d.res2 = fmtPrice(Math.max(...week.map(k => k.h)));
+      sub.textContent = `✓ RSI: ${d.rsi} | MACD: ${parseFloat(d.macd) > 0 ? '+' : ''}${d.macd} | Vol: ${d.volSig}`;
+    }
+
+    // ── 5. Orderbook ──
+    if (orderbook) {
+      d._orderbook = orderbook;
+      if (orderbook.bestBid && orderbook.bestAsk) {
+        d._spread = ((orderbook.bestAsk - orderbook.bestBid) / orderbook.bestBid * 100).toFixed(3) + '%';
+      }
+    }
+
+    // ── 6. Signal (kombiniert) ──
+    const chgNum = parseFloat(d.change) || 0;
+    const rsiNum = parseFloat(d.rsi) || 50;
+    const obPressure = orderbook?.pressure || 'neutral';
+    let bullScore = 0;
+    if (rsiNum < 30) bullScore += 3; else if (rsiNum < 40) bullScore += 1;
+    else if (rsiNum > 70) bullScore -= 3; else if (rsiNum > 60) bullScore -= 1;
+    if (d.macdSig === 'buy') bullScore += 2; else if (d.macdSig === 'sell') bullScore -= 2;
+    if (obPressure === 'buy') bullScore += 1; else if (obPressure === 'sell') bullScore -= 1;
+    if (chgNum > 4) bullScore += 1; else if (chgNum < -4) bullScore -= 1;
+    d.signal = bullScore >= 3 ? 'buy' : bullScore <= -3 ? 'sell' : 'neutral';
+
+    // ── 7. Fear & Greed ──
+    if (fearGreed) {
+      d.fear = fearGreed.value;
+      const needle = document.getElementById('fearNeedle');
+      const scoreEl = document.getElementById('fearScore');
+      const labelEl = document.getElementById('fearLabel');
+      if (needle) needle.style.left = fearGreed.value + '%';
+      if (scoreEl) { scoreEl.textContent = fearGreed.value; scoreEl.style.color = fearGreed.value < 40 ? 'var(--red)' : fearGreed.value < 60 ? 'var(--yellow)' : 'var(--green)'; }
+      if (labelEl) labelEl.textContent = fearGreed.label.toUpperCase();
+      updateTickerMeta(fearGreed.value, fearGreed.label, null);
+    }
+
+    // ── 8. UI + Orderbook Widget ──
+    updateStaticUI(sym, d);
+    updateTickerPrice(sym, d.price, d.change);
+    try { if (orderbook) updateOrderbookWidget(orderbook, d); } catch(e) {}
+
+    // ── 9. KI-Analyse ──
+    try {
+      sub.textContent = 'Claude KI generiert Analyse...';
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('de-DE', {day:'2-digit', month:'long', year:'numeric'});
+      const analysis = await getAIAnalysis(sym, d);
+      document.getElementById('aiBody').textContent = analysis;
+      document.getElementById('aiTitle').textContent =
+        `${d.name.toUpperCase()} (${sym}) – DAYTRADER ANALYSE · ${dateStr.toUpperCase()}`;
+    } catch(e) {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('de-DE', {day:'2-digit', month:'long', year:'numeric'});
+      document.getElementById('aiTitle').textContent = `${d.name.toUpperCase()} (${sym}) – ANALYSE · ${dateStr.toUpperCase()}`;
+      document.getElementById('aiBody').textContent =
+        `${d.name} (${sym}) | Kurs: ${d.price} | RSI: ${d.rsi} | Signal: ${SIGNAL_LABELS[d.signal].text}\nSupport: ${d.sup1} | Widerstand: ${d.res1}\n⚡ Stop: ${d.stop} · TP1: ${d.tp1}`;
+    }
+
+  } catch(err) {
+    // Kompletter Fallback – UI trotzdem zeigen
+    console.warn('runAnalysis Fehler:', err);
+    try { updateStaticUI(sym, d); } catch(e) {}
+    document.getElementById('aiTitle').textContent = `${d.name.toUpperCase()} (${sym}) – OFFLINE MODUS`;
+    document.getElementById('aiBody').textContent = `Live-Daten konnten nicht geladen werden.\nFallback-Daten werden angezeigt.\n\nKurs: ${d.price} | Signal: ${SIGNAL_LABELS[d.signal]?.text || 'HALTEN'}`;
+  } finally {
+    // Overlay IMMER schließen – egal was passiert
+    clearTimeout(escapeTimer);
+    overlay.classList.remove('active');
+    btn.disabled = false;
+  }
 
   // ── 10. Auto-Refresh alle 30 Sek via Binance ──
   clearTimeout(window._priceRefreshTimer);
   window._priceRefreshTimer = setTimeout(async () => {
     if (sym !== currentCoin) return;
-    const fresh = await fetchBinanceTicker(sym);
-    if (fresh) {
-      COIN_DATA[sym].price  = fmtPrice(fresh.price);
-      COIN_DATA[sym].change = fresh.change24h != null ? fresh.change24h.toFixed(2) : COIN_DATA[sym].change;
-      COIN_DATA[sym].h24    = fmtPrice(fresh.high24h);
-      COIN_DATA[sym].l24    = fmtPrice(fresh.low24h);
-      const chg = parseFloat(COIN_DATA[sym].change);
-      document.getElementById('priceValue').textContent = COIN_DATA[sym].price;
-      const ce = document.getElementById('priceChange');
-      ce.textContent = `${chg >= 0 ? '▲ +' : '▼ '}${COIN_DATA[sym].change}% (24H)`;
-      ce.className = 'price-change ' + (chg >= 0 ? 'up' : 'down');
-      document.getElementById('chartLivePrice').textContent = COIN_DATA[sym].price;
-      const cl = document.getElementById('chartLiveChange');
-      cl.textContent = (chg >= 0 ? '▲ +' : '▼ ') + COIN_DATA[sym].change + '%';
-      cl.className = chg >= 0 ? 'up' : 'down';
-      updateTickerPrice(sym, COIN_DATA[sym].price, COIN_DATA[sym].change);
-    }
-    const fg = await fetchFearGreed();
-    if (fg) {
-      const n = document.getElementById('fearNeedle');
-      const s = document.getElementById('fearScore');
-      const l = document.getElementById('fearLabel');
-      if (n) n.style.left = fg.value + '%';
-      if (s) { s.textContent = fg.value; s.style.color = fg.value < 40 ? 'var(--red)' : fg.value < 60 ? 'var(--yellow)' : 'var(--green)'; }
-      if (l) l.textContent = fg.label.toUpperCase();
-    }
+    try {
+      const fresh = await fetchBinanceTicker(sym);
+      if (fresh) {
+        COIN_DATA[sym].price  = fmtPrice(fresh.price);
+        COIN_DATA[sym].change = fresh.change24h != null ? fresh.change24h.toFixed(2) : COIN_DATA[sym].change;
+        COIN_DATA[sym].h24    = fmtPrice(fresh.high24h);
+        COIN_DATA[sym].l24    = fmtPrice(fresh.low24h);
+        const chg = parseFloat(COIN_DATA[sym].change);
+        document.getElementById('priceValue').textContent = COIN_DATA[sym].price;
+        const ce = document.getElementById('priceChange');
+        ce.textContent = `${chg >= 0 ? '▲ +' : '▼ '}${COIN_DATA[sym].change}% (24H)`;
+        ce.className = 'price-change ' + (chg >= 0 ? 'up' : 'down');
+        const clp = document.getElementById('chartLivePrice');
+        const clc = document.getElementById('chartLiveChange');
+        if (clp) clp.textContent = COIN_DATA[sym].price;
+        if (clc) { clc.textContent = (chg >= 0 ? '▲ +' : '▼ ') + COIN_DATA[sym].change + '%'; clc.className = chg >= 0 ? 'up' : 'down'; }
+        updateTickerPrice(sym, COIN_DATA[sym].price, COIN_DATA[sym].change);
+      }
+      const fg = await fetchFearGreed();
+      if (fg) {
+        const n = document.getElementById('fearNeedle');
+        const s = document.getElementById('fearScore');
+        const l = document.getElementById('fearLabel');
+        if (n) n.style.left = fg.value + '%';
+        if (s) { s.textContent = fg.value; s.style.color = fg.value < 40 ? 'var(--red)' : fg.value < 60 ? 'var(--yellow)' : 'var(--green)'; }
+        if (l) l.textContent = fg.label.toUpperCase();
+      }
+    } catch(e) {}
   }, 30000);
 }
-
 
 function updateTickerPrice(sym, price, change) {
   const chg = parseFloat(change);
