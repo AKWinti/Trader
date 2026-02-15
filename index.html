@@ -358,13 +358,247 @@ header{flex-direction:column;gap:12px;text-align:center}
 .header-right{justify-content:center}
 .selector-bar{flex-direction:column;align-items:flex-start}
 }
+
+/* –– LOGIN SCREEN –– */
+#loginScreen {
+position: fixed;
+inset: 0;
+background: var(–bg);
+z-index: 9999;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-direction: column;
+}
+#loginScreen::before {
+content:’’;
+position:fixed; inset:0;
+background-image:
+linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),
+linear-gradient(90deg,rgba(0,212,255,0.04) 1px,transparent 1px);
+background-size:50px 50px;
+animation:gridMove 20s linear infinite;
+pointer-events:none;
+}
+.login-box {
+background: var(–surface);
+border: 1px solid rgba(0,212,255,0.25);
+border-radius: 20px;
+padding: 48px 44px;
+width: 100%;
+max-width: 420px;
+position: relative;
+z-index: 1;
+box-shadow: 0 0 60px rgba(0,212,255,0.1), 0 0 120px rgba(0,80,170,0.08);
+animation: fadeUp 0.6s ease both;
+}
+.login-logo {
+text-align: center;
+margin-bottom: 36px;
+}
+.login-logo-icon {
+width: 64px; height: 64px;
+background: linear-gradient(135deg, #00d4ff, #0050aa);
+border-radius: 16px;
+display: inline-flex; align-items: center; justify-content: center;
+font-family: ‘Orbitron’, monospace; font-weight: 900; font-size: 20px; color: #fff;
+box-shadow: 0 0 30px rgba(0,212,255,0.4);
+margin-bottom: 16px;
+position: relative; overflow: hidden;
+}
+.login-logo-icon::after {
+content: ‘’; position: absolute; top: -50%; left: -50%;
+width: 200%; height: 200%;
+background: linear-gradient(transparent, rgba(255,255,255,0.12), transparent);
+animation: shine 3s infinite;
+}
+.login-title {
+font-family: ‘Orbitron’, monospace;
+font-size: 20px; font-weight: 900; color: #fff;
+letter-spacing: 3px; margin-bottom: 6px;
+}
+.login-sub {
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px; color: var(–accent); letter-spacing: 2px;
+}
+.login-divider {
+height: 1px; background: var(–border); margin: 0 0 28px;
+}
+.login-field {
+margin-bottom: 18px;
+}
+.login-label {
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 10px; color: var(–text-dim);
+letter-spacing: 2px; text-transform: uppercase;
+display: block; margin-bottom: 8px;
+}
+.login-input-wrap {
+position: relative;
+}
+.login-input {
+width: 100%;
+background: rgba(0,212,255,0.05);
+border: 1px solid var(–border);
+border-radius: 10px;
+color: #fff;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 14px;
+padding: 12px 16px 12px 42px;
+outline: none;
+transition: all 0.3s;
+letter-spacing: 1px;
+}
+.login-input:focus {
+border-color: var(–accent);
+background: rgba(0,212,255,0.08);
+box-shadow: 0 0 20px rgba(0,212,255,0.15);
+}
+.login-input::placeholder { color: var(–text-dim); }
+.login-input-icon {
+position: absolute; left: 14px; top: 50%;
+transform: translateY(-50%);
+color: var(–text-dim); font-size: 14px;
+pointer-events: none;
+}
+.login-btn {
+width: 100%;
+background: linear-gradient(135deg, #00d4ff, #0055cc);
+border: none; border-radius: 10px;
+color: #fff;
+font-family: ‘Orbitron’, monospace;
+font-size: 13px; font-weight: 700;
+letter-spacing: 3px;
+padding: 14px;
+cursor: pointer;
+margin-top: 8px;
+box-shadow: 0 0 20px rgba(0,212,255,0.3);
+transition: all 0.3s;
+position: relative; overflow: hidden;
+}
+.login-btn:hover {
+transform: translateY(-2px);
+box-shadow: 0 0 40px rgba(0,212,255,0.5);
+}
+.login-btn:active { transform: translateY(0); }
+.login-btn::after {
+content: ‘’;
+position: absolute; inset: 0;
+background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+transform: translateX(-100%) skewX(-15deg);
+transition: transform 0.5s;
+}
+.login-btn:hover::after { transform: translateX(150%) skewX(-15deg); }
+.login-error {
+background: rgba(255,58,58,0.1);
+border: 1px solid rgba(255,58,58,0.4);
+border-radius: 8px;
+padding: 10px 14px;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 12px; color: var(–red);
+letter-spacing: 1px;
+margin-top: 14px;
+display: none;
+animation: shake 0.4s ease;
+}
+.login-error.show { display: block; }
+@keyframes shake {
+0%,100%{transform:translateX(0)}
+20%{transform:translateX(-8px)}
+40%{transform:translateX(8px)}
+60%{transform:translateX(-5px)}
+80%{transform:translateX(5px)}
+}
+.login-footer {
+text-align: center;
+margin-top: 24px;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 10px; color: var(–text-dim);
+letter-spacing: 1px;
+}
+.login-screen-hidden { display: none !important; }
+
+/* Logout button in header */
+.logout-btn {
+background: rgba(255,58,58,0.1);
+border: 1px solid rgba(255,58,58,0.3);
+border-radius: 8px;
+color: var(–red);
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px; letter-spacing: 1px;
+padding: 6px 14px;
+cursor: pointer;
+transition: all 0.2s;
+}
+.logout-btn:hover {
+background: rgba(255,58,58,0.2);
+border-color: var(–red);
+}
+.user-badge {
+display: inline-flex; align-items: center; gap: 8px;
+background: rgba(0,212,255,0.08);
+border: 1px solid rgba(0,212,255,0.2);
+border-radius: 8px;
+padding: 5px 12px;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px; color: var(–accent);
+letter-spacing: 1px;
+}
+.user-dot {
+width: 6px; height: 6px; border-radius: 50%;
+background: var(–green);
+animation: pulse 2s infinite;
+}
 </style>
 
 </head>
 <body>
 
-<!-- LOADING OVERLAY -->
+<!-- ====== LOGIN SCREEN ====== -->
 
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">◈</div>
+      <div class="login-title">CRYPTO SIGNAL</div>
+      <div class="login-sub">DAYTRADER DASHBOARD · SECURE ACCESS</div>
+    </div>
+    <div class="login-divider"></div>
+
+```
+<div class="login-field">
+  <label class="login-label" for="loginUser">▸ Benutzername</label>
+  <div class="login-input-wrap">
+    <span class="login-input-icon">👤</span>
+    <input class="login-input" type="text" id="loginUser" placeholder="Username eingeben" autocomplete="username" />
+  </div>
+</div>
+
+<div class="login-field">
+  <label class="login-label" for="loginPass">▸ Passwort</label>
+  <div class="login-input-wrap">
+    <span class="login-input-icon">🔒</span>
+    <input class="login-input" type="password" id="loginPass" placeholder="Passwort eingeben" autocomplete="current-password" />
+  </div>
+</div>
+
+<button class="login-btn" onclick="doLogin()">⚡ EINLOGGEN</button>
+
+<div class="login-error" id="loginError">
+  ✕ &nbsp; UNGÜLTIGE ZUGANGSDATEN
+</div>
+
+<div class="login-footer">
+  CRYPTO SIGNAL DASHBOARD · ZUGANG NUR FÜR AUTORISIERTE NUTZER
+</div>
+```
+
+  </div>
+</div>
+
+<!-- ====== DASHBOARD (verborgen bis Login) ====== -->
+
+<div id="dashboardWrapper" style="display:none;">
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
   <div class="loading-text">ANALYSE LÄUFT</div>
@@ -381,8 +615,10 @@ header{flex-direction:column;gap:12px;text-align:center}
       </div>
     </div>
     <div class="header-right">
+      <div class="user-badge" id="userBadge"><span class="user-dot"></span>ADMIN</div>
       <div class="live-badge"><div class="live-dot"></div>KI ANALYSE</div>
       <div class="timestamp" id="timestamp"></div>
+      <button class="logout-btn" onclick="doLogout()">⏻ LOGOUT</button>
     </div>
   </header>
 </div>
@@ -625,6 +861,8 @@ header{flex-direction:column;gap:12px;text-align:center}
     <div class="footer-brand" id="footerBrand">CRYPTO SIGNAL DASHBOARD · FEB 2026</div>
   </footer>
 </div>
+
+</div><!-- end dashboardWrapper -->
 
 <script>
 const COIN_DATA = {
@@ -922,18 +1160,80 @@ Wichtig: Beziehe dich immer namentlich auf ${sym}/${d.name}, nie auf andere Coin
   return data.content.map(b => b.text || '').join('');
 }
 
+// ---- LOGIN LOGIC ----
+const USERS = { admin: 'Admin1' };
+
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err  = document.getElementById('loginError');
+
+  if (USERS[user] && USERS[user] === pass) {
+    // Success
+    const screen = document.getElementById('loginScreen');
+    screen.style.opacity = '1';
+    screen.style.transition = 'opacity 0.5s ease';
+    setTimeout(() => { screen.style.opacity = '0'; }, 50);
+    setTimeout(() => {
+      screen.classList.add('login-screen-hidden');
+      const wrapper = document.getElementById('dashboardWrapper');
+      wrapper.style.display = 'block';
+      wrapper.style.opacity = '0';
+      wrapper.style.transition = 'opacity 0.5s ease';
+      setTimeout(() => { wrapper.style.opacity = '1'; }, 50);
+      // Show username in header
+      document.getElementById('userBadge').innerHTML =
+        `<span class="user-dot"></span>${user.toUpperCase()}`;
+      // Start analysis
+      runAnalysis();
+    }, 500);
+    err.classList.remove('show');
+  } else {
+    // Error
+    err.classList.remove('show');
+    void err.offsetWidth; // reflow for animation replay
+    err.classList.add('show');
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+  }
+}
+
+function doLogout() {
+  const wrapper = document.getElementById('dashboardWrapper');
+  wrapper.style.transition = 'opacity 0.4s ease';
+  wrapper.style.opacity = '0';
+  setTimeout(() => {
+    wrapper.style.display = 'none';
+    const screen = document.getElementById('loginScreen');
+    screen.classList.remove('login-screen-hidden');
+    screen.style.opacity = '0';
+    screen.style.transition = 'opacity 0.4s ease';
+    setTimeout(() => { screen.style.opacity = '1'; }, 50);
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginError').classList.remove('show');
+  }, 400);
+}
+
+// Enter key support
+document.addEventListener('DOMContentLoaded', () => {
+  ['loginUser','loginPass'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+  });
+});
+
 // Clock
 function updateTime() {
   const now = new Date();
   const d = now.toLocaleDateString('de-DE', { day:'2-digit', month:'long', year:'numeric' });
   const t = now.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
-  document.getElementById('timestamp').textContent = `${d.toUpperCase()} · ${t} CET`;
+  const el = document.getElementById('timestamp');
+  if (el) el.textContent = `${d.toUpperCase()} · ${t} CET`;
 }
 updateTime();
 setInterval(updateTime, 60000);
-
-// Trigger initial analysis on load
-window.addEventListener('load', () => runAnalysis());
 </script>
 
 </body>
