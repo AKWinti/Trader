@@ -1897,13 +1897,13 @@ function updateOrderbookWidget(orderbook, d) {
 
   const obRowsEl = document.getElementById('obRows');
   if (obRowsEl) {
-    obRowsEl.innerHTML = `<div class="ob-row ob-header"><span>Menge (Bid)</span><span>Preis</span><span>Menge (Ask)</span></div>` +
+    obRowsEl.innerHTML = `<div class="ob-row ob-header"><span>Menge (Bid)<\/span><span>Preis<\/span><span>Menge (Ask)<\/span><\/div>` +
       rows.map(r => `
         <div class="ob-row">
-          <span class="ob-bid-val">${r.bidVol}</span>
-          <span class="ob-price-val">${fmtPrice(r.isMid ? p : r.askP)}</span>
-          <span class="ob-ask-val">${r.askVol}</span>
-        </div>`).join('');
+          <span class="ob-bid-val">${r.bidVol}<\/span>
+          <span class="ob-price-val">${fmtPrice(r.isMid ? p : r.askP)}<\/span>
+          <span class="ob-ask-val">${r.askVol}<\/span>
+        <\/div>`).join('');
   }
 
   // ── Binance-Stats Widget ──
@@ -1979,11 +1979,11 @@ function updateStaticUI(sym, d) {
 
   // Levels
   document.getElementById('levelsTable').innerHTML = `
-    <div class="level-row"><span class="level-label">Widerstand 2</span><span class="level-price" style="color:var(--red)">${d.res2}</span><span class="level-type res">RES</span></div>
-    <div class="level-row"><span class="level-label">Widerstand 1</span><span class="level-price" style="color:var(--red)">${d.res1}</span><span class="level-type res">RES</span></div>
-    <div class="level-row"><span class="level-label">AKTUELL ▶</span><span class="level-price" style="color:var(--accent)">${d.cur}</span><span class="level-type cur">LIVE</span></div>
-    <div class="level-row"><span class="level-label">Support 1</span><span class="level-price" style="color:var(--green)">${d.sup1}</span><span class="level-type sup">SUP</span></div>
-    <div class="level-row"><span class="level-label">Support 2</span><span class="level-price" style="color:var(--green)">${d.sup2}</span><span class="level-type sup">SUP</span></div>
+    <div class="level-row"><span class="level-label">Widerstand 2<\/span><span class="level-price" style="color:var(--red)">${d.res2}<\/span><span class="level-type res">RES<\/span><\/div>
+    <div class="level-row"><span class="level-label">Widerstand 1<\/span><span class="level-price" style="color:var(--red)">${d.res1}<\/span><span class="level-type res">RES<\/span><\/div>
+    <div class="level-row"><span class="level-label">AKTUELL ▶<\/span><span class="level-price" style="color:var(--accent)">${d.cur}<\/span><span class="level-type cur">LIVE<\/span><\/div>
+    <div class="level-row"><span class="level-label">Support 1<\/span><span class="level-price" style="color:var(--green)">${d.sup1}<\/span><span class="level-type sup">SUP<\/span><\/div>
+    <div class="level-row"><span class="level-label">Support 2<\/span><span class="level-price" style="color:var(--green)">${d.sup2}<\/span><span class="level-type sup">SUP<\/span><\/div>
   `;
 
   // ── Szenario-Wahrscheinlichkeiten dynamisch aus echten Indikatoren ──
@@ -2028,7 +2028,7 @@ function updateStaticUI(sym, d) {
   const rc2 = riskConfig2[d.risk - 1];
   const circleSymbols2 = ['!','!','!','~','·'];
   document.getElementById('riskCircles').innerHTML = rc2.map((v,i) =>
-    `<div class="risk-circle ${v ? (i < 3 ? 'rc-filled-red' : 'rc-filled-yellow') : 'rc-empty'}">${circleSymbols2[i]}</div>`
+    `<div class="risk-circle ${v ? (i < 3 ? 'rc-filled-red' : 'rc-filled-yellow') : 'rc-empty'}">${circleSymbols2[i]}<\/div>`
   ).join('');
   const riskLabels2 = ['','SEHR NIEDRIG (1/5)','NIEDRIG (2/5)','HOCH (3/5)','SEHR HOCH (4/5)','EXTREM (5/5) · NUR EXPERTEN'];
   document.getElementById('riskLabel').textContent = riskLabels2[d.risk] + ' · STOP-LOSS PFLICHT';
@@ -2078,40 +2078,40 @@ function updateStaticUI(sym, d) {
 
   document.getElementById('indicatorsTable').innerHTML = `
     <div class="indicator-row">
-      <span class="ind-name">RSI (14)</span>
-      <span class="ind-val" style="color:${rsiColor}">${d.rsi}</span>
-      <span class="ind-signal ${rsiSigCls}">${rsiSigTxt}</span>
-    </div>
+      <span class="ind-name">RSI (14)<\/span>
+      <span class="ind-val" style="color:${rsiColor}">${d.rsi}<\/span>
+      <span class="ind-signal ${rsiSigCls}">${rsiSigTxt}<\/span>
+    <\/div>
     <div class="indicator-row">
-      <span class="ind-name">MACD (12,26)</span>
-      <span class="ind-val" style="color:${macdColor}">${d.macd}</span>
-      <span class="ind-signal ${sigClass[d.macdSig]}">${d.macdSig === 'buy' ? 'BULLISCH' : d.macdSig === 'sell' ? 'BÄRISCH' : 'NEUTRAL'}</span>
-    </div>
+      <span class="ind-name">MACD (12,26)<\/span>
+      <span class="ind-val" style="color:${macdColor}">${d.macd}<\/span>
+      <span class="ind-signal ${sigClass[d.macdSig]}">${d.macdSig === 'buy' ? 'BULLISCH' : d.macdSig === 'sell' ? 'BÄRISCH' : 'NEUTRAL'}<\/span>
+    <\/div>
     <div class="indicator-row">
-      <span class="ind-name">Williams %R</span>
-      <span class="ind-val" style="color:${sigColor[d.willSig]}">${d.williams}</span>
-      <span class="ind-signal ${sigClass[d.willSig]}">${d.willSig === 'buy' ? 'ÜBERVERKAUFT' : d.willSig === 'sell' ? 'ÜBERKAUFT' : 'NEUTRAL'}</span>
-    </div>
+      <span class="ind-name">Williams %R<\/span>
+      <span class="ind-val" style="color:${sigColor[d.willSig]}">${d.williams}<\/span>
+      <span class="ind-signal ${sigClass[d.willSig]}">${d.willSig === 'buy' ? 'ÜBERVERKAUFT' : d.willSig === 'sell' ? 'ÜBERKAUFT' : 'NEUTRAL'}<\/span>
+    <\/div>
     <div class="indicator-row">
-      <span class="ind-name">MA 5 (SMA)</span>
-      <span class="ind-val" style="color:${ma5Color}">${d.ma5}</span>
-      <span class="ind-signal ${sigClass[d.ma5sig]}">${sigText[d.ma5sig]}</span>
-    </div>
+      <span class="ind-name">MA 5 (SMA)<\/span>
+      <span class="ind-val" style="color:${ma5Color}">${d.ma5}<\/span>
+      <span class="ind-signal ${sigClass[d.ma5sig]}">${sigText[d.ma5sig]}<\/span>
+    <\/div>
     <div class="indicator-row">
-      <span class="ind-name">MA 50 (SMA)</span>
-      <span class="ind-val" style="color:${ma50Color}">${d.ma50}</span>
-      <span class="ind-signal ${sigClass[d.ma50sig]}">${sigText[d.ma50sig]}</span>
-    </div>
+      <span class="ind-name">MA 50 (SMA)<\/span>
+      <span class="ind-val" style="color:${ma50Color}">${d.ma50}<\/span>
+      <span class="ind-signal ${sigClass[d.ma50sig]}">${sigText[d.ma50sig]}<\/span>
+    <\/div>
     <div class="indicator-row">
-      <span class="ind-name">Bollinger Bands</span>
-      <span class="ind-val" style="color:var(--yellow)">${d.bb}</span>
-      <span class="ind-signal ${parseFloat(d.bb) > 0.2 ? 'sig-sell' : parseFloat(d.bb) < 0.08 ? 'sig-buy' : 'sig-neutral'}">${parseFloat(d.bb) > 0.2 ? 'WEIT' : parseFloat(d.bb) < 0.08 ? 'ENG' : 'NORMAL'}</span>
-    </div>
+      <span class="ind-name">Bollinger Bands<\/span>
+      <span class="ind-val" style="color:var(--yellow)">${d.bb}<\/span>
+      <span class="ind-signal ${parseFloat(d.bb) > 0.2 ? 'sig-sell' : parseFloat(d.bb) < 0.08 ? 'sig-buy' : 'sig-neutral'}">${parseFloat(d.bb) > 0.2 ? 'WEIT' : parseFloat(d.bb) < 0.08 ? 'ENG' : 'NORMAL'}<\/span>
+    <\/div>
     <div class="indicator-row">
-      <span class="ind-name">Volumen (24H)</span>
-      <span class="ind-val" style="color:var(--accent)">${d.vol}</span>
-      <span class="ind-signal ${d.volSig === 'hoch' ? 'sig-buy' : d.volSig === 'niedrig' ? 'sig-sell' : 'sig-neutral'}">${d.volSig.toUpperCase()}</span>
-    </div>
+      <span class="ind-name">Volumen (24H)<\/span>
+      <span class="ind-val" style="color:var(--accent)">${d.vol}<\/span>
+      <span class="ind-signal ${d.volSig === 'hoch' ? 'sig-buy' : d.volSig === 'niedrig' ? 'sig-sell' : 'sig-neutral'}">${d.volSig.toUpperCase()}<\/span>
+    <\/div>
   `;
 
   // ── Sentiment-Rows aus echten Indikatoren ableiten ──
@@ -2134,20 +2134,20 @@ function updateStaticUI(sym, d) {
 
   document.getElementById('sentimentRows').innerHTML = `
     <div class="indicator-row">
-      <span class="ind-name">News-Sentiment</span>
-      <span class="ind-val" style="color:${newsSentColor}">${newsSentScore}/100</span>
-      <span class="ind-signal ${newsSentSig}">${newsSentLabel}</span>
-    </div>
+      <span class="ind-name">News-Sentiment<\/span>
+      <span class="ind-val" style="color:${newsSentColor}">${newsSentScore}/100<\/span>
+      <span class="ind-signal ${newsSentSig}">${newsSentLabel}<\/span>
+    <\/div>
     <div class="indicator-row">
-      <span class="ind-name">Kapitalfluss (24H)</span>
-      <span class="ind-val" style="color:${capClr}">${capDir}</span>
-      <span class="ind-signal ${capSig}">${capDir}</span>
-    </div>
+      <span class="ind-name">Kapitalfluss (24H)<\/span>
+      <span class="ind-val" style="color:${capClr}">${capDir}<\/span>
+      <span class="ind-signal ${capSig}">${capDir}<\/span>
+    <\/div>
     <div class="indicator-row">
-      <span class="ind-name">Marktkapitalisierung</span>
-      <span class="ind-val" style="color:${mcapClr}">${mcapLive}</span>
-      <span class="ind-signal ${mcapSig}">${mcapTxt}</span>
-    </div>
+      <span class="ind-name">Marktkapitalisierung<\/span>
+      <span class="ind-val" style="color:${mcapClr}">${mcapLive}<\/span>
+      <span class="ind-signal ${mcapSig}">${mcapTxt}<\/span>
+    <\/div>
   `;
   document.getElementById('scNeutralText').textContent = `${d.sup1} – ${d.res1} · Konsolidierung`;
   document.getElementById('scBullText').textContent = `${d.res1} – ${d.res2} · Ausbruch nötig`;
@@ -2157,39 +2157,39 @@ function updateStaticUI(sym, d) {
   const isLeverageOk = d.risk <= 2;
   const leverageTip = isLeverageOk
     ? `RSI ${d.rsi} & Markt stabil – moderater Hebel (2–3x) möglich.`
-    : `RSI ${d.rsi} & Risiko ${d.risk}/5 – <strong>kein Leverage</strong>. Zu hohes Liquidationsrisiko.`;
+    : `RSI ${d.rsi} & Risiko ${d.risk}/5 – <strong>kein Leverage<\/strong>. Zu hohes Liquidationsrisiko.`;
 
   document.getElementById('playbookContent').innerHTML = `
     <div class="tip-row">
-      <span class="tip-icon">🎯</span>
-      <span class="tip-text"><strong>Einstieg Long:</strong> Nur bei bestätigtem Ausbruch über <strong>${d.entryLong}</strong> mit Volumen. Nicht vorher kaufen.</span>
-    </div>
+      <span class="tip-icon">🎯<\/span>
+      <span class="tip-text"><strong>Einstieg Long:<\/strong> Nur bei bestätigtem Ausbruch über <strong>${d.entryLong}<\/strong> mit Volumen. Nicht vorher kaufen.<\/span>
+    <\/div>
     <div class="tip-row">
-      <span class="tip-icon">🛑</span>
-      <span class="tip-text"><strong>Stop-Loss:</strong> Unter <strong>${d.stop}</strong> setzen. Kein Trade ohne Stop in diesem Markt.</span>
-    </div>
+      <span class="tip-icon">🛑<\/span>
+      <span class="tip-text"><strong>Stop-Loss:<\/strong> Unter <strong>${d.stop}<\/strong> setzen. Kein Trade ohne Stop in diesem Markt.<\/span>
+    <\/div>
     <div class="tip-row">
-      <span class="tip-icon">📈</span>
-      <span class="tip-text"><strong>Take Profit:</strong> Erstes Ziel <strong>${d.tp1}</strong>, Zweites Ziel <strong>${d.tp2}</strong>. Gewinne sichern!</span>
-    </div>
+      <span class="tip-icon">📈<\/span>
+      <span class="tip-text"><strong>Take Profit:<\/strong> Erstes Ziel <strong>${d.tp1}<\/strong>, Zweites Ziel <strong>${d.tp2}<\/strong>. Gewinne sichern!<\/span>
+    <\/div>
     <div class="tip-row">
-      <span class="tip-icon">👀</span>
-      <span class="tip-text"><strong>Markt-Kontext:</strong> ${d.btcNote}</span>
-    </div>
+      <span class="tip-icon">👀<\/span>
+      <span class="tip-text"><strong>Markt-Kontext:<\/strong> ${d.btcNote}<\/span>
+    <\/div>
     <div class="tip-row">
-      <span class="tip-icon">⚡</span>
-      <span class="tip-text">${leverageTip}</span>
-    </div>
+      <span class="tip-icon">⚡<\/span>
+      <span class="tip-text">${leverageTip}<\/span>
+    <\/div>
   `;
 
   // Risiko-Text
   const riskTexts = [
     '', 
-    `${d.name} gilt als <strong style="color:var(--green)">vergleichsweise stabil</strong>. Dennoch Stop-Loss setzen.`,
-    `${d.name} hat <strong style="color:var(--green)">moderates Risiko</strong>. Stop-Loss und Positionsgröße beachten.`,
-    `${d.name} befindet sich in einer <strong style="color:var(--yellow)">Hochrisiko-Zone</strong>. Strenge Stop-Losses sind Pflicht.`,
-    `${d.name} zeigt <strong style="color:var(--orange)">sehr hohes Risiko</strong>. Nur kleine Positionen, enger Stop.`,
-    `${d.name} ist <strong style="color:var(--red)">extrem riskant</strong>. Nur für erfahrene Trader mit kleiner Position.`
+    `${d.name} gilt als <strong style="color:var(--green)">vergleichsweise stabil<\/strong>. Dennoch Stop-Loss setzen.`,
+    `${d.name} hat <strong style="color:var(--green)">moderates Risiko<\/strong>. Stop-Loss und Positionsgröße beachten.`,
+    `${d.name} befindet sich in einer <strong style="color:var(--yellow)">Hochrisiko-Zone<\/strong>. Strenge Stop-Losses sind Pflicht.`,
+    `${d.name} zeigt <strong style="color:var(--orange)">sehr hohes Risiko<\/strong>. Nur kleine Positionen, enger Stop.`,
+    `${d.name} ist <strong style="color:var(--red)">extrem riskant<\/strong>. Nur für erfahrene Trader mit kleiner Position.`
   ];
   document.getElementById('riskText').innerHTML = riskTexts[d.risk];
 
@@ -2588,9 +2588,9 @@ function drawChart(coin, range) {
 
     const labelIdx = labels[idx] || labels.filter(l=>l)[Math.floor(idx/prices.length * labels.filter(l=>l).length)] || '';
 
-    tooltip.innerHTML = `<span style="color:var(--accent);font-size:10px;">${labelIdx || '–'}</span><br>
-      <span style="font-size:13px;font-weight:700;">${priceStr}</span>
-      <span style="color:${color};margin-left:6px;">${sign}${pct}%</span>`;
+    tooltip.innerHTML = `<span style="color:var(--accent);font-size:10px;">${labelIdx || '–'}<\/span><br>
+      <span style="font-size:13px;font-weight:700;">${priceStr}<\/span>
+      <span style="color:${color};margin-left:6px;">${sign}${pct}%<\/span>`;
 
     const tx = mx + 14;
     const ty = e.clientY - rect.top - 30;
@@ -2720,7 +2720,7 @@ function setHorizon(days) {
 function buildCoinOptions(selected = '') {
   return ALL_COINS.map(sym => {
     const d = COIN_DATA[sym];
-    return `<option value="${sym}" ${sym === selected ? 'selected' : ''}>${sym} – ${d ? d.name : sym}</option>`;
+    return `<option value="${sym}" ${sym === selected ? 'selected' : ''}>${sym} – ${d ? d.name : sym}<\/option>`;
   }).join('');
 }
 
@@ -2732,9 +2732,9 @@ function addCoinRow(sym = '', usd = '') {
   row.className = 'coin-input-row';
   row.id = 'row-' + id;
   row.innerHTML = `
-    <select onchange="updateRowCoin(${id},this.value)">${buildCoinOptions(sym)}</select>
+    <select onchange="updateRowCoin(${id},this.value)">${buildCoinOptions(sym)}<\/select>
     <input type="number" id="amt-${id}" placeholder="USD" min="0" step="0.01" value="${usd}" />
-    <button class="remove-btn" onclick="removeCoinRow(${id})">✕</button>
+    <button class="remove-btn" onclick="removeCoinRow(${id})">✕<\/button>
   `;
   list.appendChild(row);
 }
@@ -2761,7 +2761,7 @@ async function analyzePortfolio() {
   const entries = getPortfolioEntries();
   if (entries.length === 0) {
     document.getElementById('portfolioResults').innerHTML =
-      `<div class="portfolio-empty"><div class="empty-icon">⚠️</div><div>Bitte mindestens einen Coin mit Betrag eingeben.</div></div>`;
+      `<div class="portfolio-empty"><div class="empty-icon">⚠️<\/div><div>Bitte mindestens einen Coin mit Betrag eingeben.<\/div><\/div>`;
     return;
   }
 
@@ -2770,7 +2770,7 @@ async function analyzePortfolio() {
   btn.textContent = '⏳ ANALYSIERE...';
 
   document.getElementById('portfolioResults').innerHTML =
-    `<div class="portfolio-empty"><div class="empty-icon" style="animation:spin 1s linear infinite;display:inline-block">⚡</div><div>Live-Daten werden geladen...</div></div>`;
+    `<div class="portfolio-empty"><div class="empty-icon" style="animation:spin 1s linear infinite;display:inline-block">⚡<\/div><div>Live-Daten werden geladen...<\/div><\/div>`;
 
   // ── Live-Daten für alle Coins im Portfolio laden ──
   const liveData = {};
@@ -2820,7 +2820,7 @@ async function analyzePortfolio() {
   }));
 
   document.getElementById('portfolioResults').innerHTML =
-    `<div class="portfolio-empty"><div class="empty-icon" style="animation:spin 1s linear infinite;display:inline-block">⚡</div><div>KI generiert Empfehlungen...</div></div>`;
+    `<div class="portfolio-empty"><div class="empty-icon" style="animation:spin 1s linear infinite;display:inline-block">⚡<\/div><div>KI generiert Empfehlungen...<\/div><\/div>`;
 
   // ── KI-Analyse aufrufen ──
   try {
@@ -3002,27 +3002,27 @@ function renderPortfolioResults(entries, liveData, aiText, horizon) {
   <!-- SUMMARY -->
   <div class="portfolio-summary">
     <div class="summary-stat">
-      <div class="summary-stat-val" style="color:var(--accent)">$${totalUsd.toLocaleString('de-DE', {minimumFractionDigits:2,maximumFractionDigits:2})}</div>
-      <div class="summary-stat-lbl">PORTFOLIO GESAMT</div>
-    </div>
+      <div class="summary-stat-val" style="color:var(--accent)">$${totalUsd.toLocaleString('de-DE', {minimumFractionDigits:2,maximumFractionDigits:2})}<\/div>
+      <div class="summary-stat-lbl">PORTFOLIO GESAMT<\/div>
+    <\/div>
     <div class="summary-stat">
-      <div class="summary-stat-val ${avgPot >= 0 ? 'pos' : 'neg'}" style="color:${avgPot >= 0 ? 'var(--green)' : 'var(--red)'}">${avgPot >= 0 ? '+':''}${avgPot.toFixed(1)}%</div>
-      <div class="summary-stat-lbl">Ø POTENZIAL (${horizonLabel})</div>
-    </div>
+      <div class="summary-stat-val ${avgPot >= 0 ? 'pos' : 'neg'}" style="color:${avgPot >= 0 ? 'var(--green)' : 'var(--red)'}">${avgPot >= 0 ? '+':''}${avgPot.toFixed(1)}%<\/div>
+      <div class="summary-stat-lbl">Ø POTENZIAL (${horizonLabel})<\/div>
+    <\/div>
     <div class="summary-stat">
-      <div class="summary-stat-val" style="color:var(--green)">${holdCount}</div>
-      <div class="summary-stat-lbl">HALTEN</div>
-    </div>
+      <div class="summary-stat-val" style="color:var(--green)">${holdCount}<\/div>
+      <div class="summary-stat-lbl">HALTEN<\/div>
+    <\/div>
     <div class="summary-stat">
-      <div class="summary-stat-val" style="color:var(--yellow)">${swapCount}</div>
-      <div class="summary-stat-lbl">TAUSCHEN</div>
-    </div>
+      <div class="summary-stat-val" style="color:var(--yellow)">${swapCount}<\/div>
+      <div class="summary-stat-lbl">TAUSCHEN<\/div>
+    <\/div>
     ${bestGlobal ? `
     <div class="summary-stat">
-      <div class="summary-stat-val" style="color:var(--accent)">${bestGlobal.sym}</div>
-      <div class="summary-stat-lbl">BESTE CHANCE</div>
-    </div>` : ''}
-  </div>
+      <div class="summary-stat-val" style="color:var(--accent)">${bestGlobal.sym}<\/div>
+      <div class="summary-stat-lbl">BESTE CHANCE<\/div>
+    <\/div>` : ''}
+  <\/div>
 
   <!-- EMPFEHLUNGS-KARTEN -->
   <div class="advice-grid">`;
@@ -3036,144 +3036,140 @@ function renderPortfolioResults(entries, liveData, aiText, horizon) {
     html += `
     <div class="advice-card ${rec.colorClass}" style="animation-delay:${i*0.08}s">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div class="advice-action ${rec.colorClass}">${actionLabel}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim)">Score: ${rec.myScore}/100</div>
-      </div>
+        <div class="advice-action ${rec.colorClass}">${actionLabel}<\/div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim)">Score: ${rec.myScore}/100<\/div>
+      <\/div>
       <div class="advice-coin-row">
         <div>
-          <div class="advice-coin-name">${rec.sym}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim)">${rec.d?.name || rec.sym}</div>
-        </div>
+          <div class="advice-coin-name">${rec.sym}<\/div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim)">${rec.d?.name || rec.sym}<\/div>
+        <\/div>
         <div style="text-align:right;">
-          <div style="font-family:'Orbitron',monospace;font-size:14px;color:var(--accent)">${rec.d?.price || '–'}</div>
+          <div style="font-family:'Orbitron',monospace;font-size:14px;color:var(--accent)">${rec.d?.price || '–'}<\/div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${parseFloat(rec.d?.change) >= 0 ? 'var(--green)':'var(--red)'}">
             ${parseFloat(rec.d?.change) >= 0 ? '▲ +':' ▼ '}${rec.d?.change}%
-          </div>
-        </div>
-      </div>
+          <\/div>
+        <\/div>
+      <\/div>
       ${rec.action === 'swap' && rec.targetSym ? `
       <div style="display:flex;align-items:center;gap:8px;margin:8px 0;">
-        <span style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim)">${rec.sym}</span>
-        <span style="color:var(--green);font-size:18px">→</span>
-        <span style="font-family:'Orbitron',monospace;font-size:15px;color:var(--green);font-weight:900">${rec.targetSym}</span>
-        <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim)">(${COIN_DATA[rec.targetSym]?.name})</span>
-      </div>
+        <span style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim)">${rec.sym}<\/span>
+        <span style="color:var(--green);font-size:18px">→<\/span>
+        <span style="font-family:'Orbitron',monospace;font-size:15px;color:var(--green);font-weight:900">${rec.targetSym}<\/span>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim)">(${COIN_DATA[rec.targetSym]?.name})<\/span>
+      <\/div>
       <div style="font-family:'Orbitron',monospace;font-size:13px;color:var(--green);margin-bottom:4px;">
         Potenzial: +${estimatePotential(rec.targetSym, horizon)}% (${horizonLabel})
-      </div>` : ''}
+      <\/div>` : ''}
       <div class="advice-potential ${potClass}">
         ${rec.myPot >= 0 ? '+':''}${rec.myPot}%
-        <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);font-weight:400"> (${horizonLabel})</span>
-      </div>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);font-weight:400"> (${horizonLabel})<\/span>
+      <\/div>
       <div class="advice-meta">
-        <div class="advice-meta-item">RSI: <strong>${rec.d?.rsi || '–'}</strong></div>
+        <div class="advice-meta-item">RSI: <strong>${rec.d?.rsi || '–'}<\/strong><\/div>
         <div class="advice-meta-item">MACD: <strong style="color:${parseFloat(rec.d?.macd)>0?'var(--green)':'var(--red)'}">
-          ${parseFloat(rec.d?.macd) > 0 ? '▲' : '▼'} ${rec.d?.macd || '–'}</strong></div>
-        <div class="advice-meta-item">Risiko: <strong>${rec.d?.risk || '–'}/5</strong></div>
-        <div class="advice-meta-item">Wert: <strong>$${rec.usd.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div>
-      </div>
-      <div class="advice-reason">${rec.reason}</div>
+          ${parseFloat(rec.d?.macd) > 0 ? '▲' : '▼'} ${rec.d?.macd || '–'}<\/strong><\/div>
+        <div class="advice-meta-item">Risiko: <strong>${rec.d?.risk || '–'}/5<\/strong><\/div>
+        <div class="advice-meta-item">Wert: <strong>$${rec.usd.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})}<\/strong><\/div>
+      <\/div>
+      <div class="advice-reason">${rec.reason}<\/div>
       <div class="confidence-bar-wrap">
-        <label>SIGNAL-STÄRKE: ${confPct}%</label>
+        <label>SIGNAL-STÄRKE: ${confPct}%<\/label>
         <div class="confidence-bar">
           <div class="confidence-fill" style="width:0%;background:${confColor};transition:width 1.2s ease ${i*0.1}s;"
-            data-target="${confPct}"></div>
-        </div>
-      </div>
-    </div>`;
+            data-target="${confPct}"><\/div>
+        <\/div>
+      <\/div>
+    <\/div>`;
   });
 
-  html += `</div>`;
+  html += `<\/div>`;
 
   // KI-Analyse
   if (aiText) {
     html += `
     <div class="ai-full-advice">
-      <h3>⚡ KI PORTFOLIO-ANALYSE · ${horizonLabel.toUpperCase()}</h3>
-      <pre>${aiText}</pre>
+      <h3>⚡ KI PORTFOLIO-ANALYSE · ${horizonLabel.toUpperCase()}<\/h3>
+      <pre>${aiText}<\/pre>
+    <\/div>`;
+  }
 
-```
-</div>`;
-```
+  document.getElementById('portfolioResults').innerHTML = html;
 
-}
-
-document.getElementById(‘portfolioResults’).innerHTML = html;
-
-// Confidence-Bars animieren
-setTimeout(() => {
-document.querySelectorAll(’.confidence-fill[data-target]’).forEach(el => {
-el.style.width = el.dataset.target + ‘%’;
-});
-}, 100);
+  // Confidence-Bars animieren
+  setTimeout(() => {
+    document.querySelectorAll('.confidence-fill[data-target]').forEach(el => {
+      el.style.width = el.dataset.target + '%';
+    });
+  }, 100);
 }
 
 // Portfolio-Seite initialisieren
 function initPortfolio() {
-if (portfolioRows.length === 0) {
-addCoinRow(‘XRP’, ‘’);
-addCoinRow(‘SOL’, ‘’);
-}
+  if (portfolioRows.length === 0) {
+    addCoinRow('XRP', '');
+    addCoinRow('SOL', '');
+  }
 }
 
 // CSS spin animation
-const spinStyle = document.createElement(‘style’);
-spinStyle.textContent = ‘@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}’;
+const spinStyle = document.createElement('style');
+spinStyle.textContent = '@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}';
 document.head.appendChild(spinStyle);
 
 // Globaler Fehler-Auffänger
 window.onerror = function(msg, src, line, col, err) {
-console.error(‘Global JS Error:’, msg, ‘Zeile:’, line, err);
-var ov = document.getElementById(‘loadingOverlay’);
-var btn = document.getElementById(‘analyzeBtn’);
-if (ov) ov.classList.remove(‘active’);
-if (btn) btn.disabled = false;
-return false;
+  console.error('Global JS Error:', msg, 'Zeile:', line, err);
+  var ov = document.getElementById('loadingOverlay');
+  var btn = document.getElementById('analyzeBtn');
+  if (ov) ov.classList.remove('active');
+  if (btn) btn.disabled = false;
+  return false;
 };
 
 // Alles nach DOM-Laden initialisieren
-document.addEventListener(‘DOMContentLoaded’, function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-// coinSelect Change-Handler
-var coinSel = document.getElementById(‘coinSelect’);
-if (coinSel) {
-coinSel.addEventListener(‘change’, function() {
-var sym = this.value;
-document.querySelectorAll(’.chip’).forEach(function(c) {
-c.classList.toggle(‘active’, c.textContent === sym);
-});
-});
-}
+  // coinSelect Change-Handler
+  var coinSel = document.getElementById('coinSelect');
+  if (coinSel) {
+    coinSel.addEventListener('change', function() {
+      var sym = this.value;
+      document.querySelectorAll('.chip').forEach(function(c) {
+        c.classList.toggle('active', c.textContent === sym);
+      });
+    });
+  }
 
-// Login-Button (Backup falls onclick nicht greift)
-var loginBtn = document.getElementById(‘loginBtn’);
-if (loginBtn && !loginBtn._bound) {
-loginBtn._bound = true;
-loginBtn.addEventListener(‘click’, function(e) {
-e.preventDefault();
-doLogin();
-});
-}
+  // Login-Button (Backup falls onclick nicht greift)
+  var loginBtn = document.getElementById('loginBtn');
+  if (loginBtn && !loginBtn._bound) {
+    loginBtn._bound = true;
+    loginBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      doLogin();
+    });
+  }
 
-// Enter-Taste in Login-Feldern
-[‘loginUser’, ‘loginPass’].forEach(function(id) {
-var el = document.getElementById(id);
-if (el) {
-el.addEventListener(‘keydown’, function(e) {
-if (e.key === ‘Enter’) { e.preventDefault(); doLogin(); }
-});
-}
-});
+  // Enter-Taste in Login-Feldern
+  ['loginUser', 'loginPass'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
+      });
+    }
+  });
 
 });
 
 // Clock
 function updateTime() {
-const now = new Date();
-const d = now.toLocaleDateString(‘de-DE’, { day:‘2-digit’, month:‘long’, year:‘numeric’ });
-const t = now.toLocaleTimeString(‘de-DE’, { hour:‘2-digit’, minute:‘2-digit’ });
-const el = document.getElementById(‘timestamp’);
-if (el) el.textContent = `${d.toUpperCase()} · ${t} CET`;
+  const now = new Date();
+  const d = now.toLocaleDateString('de-DE', { day:'2-digit', month:'long', year:'numeric' });
+  const t = now.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
+  const el = document.getElementById('timestamp');
+  if (el) el.textContent = `${d.toUpperCase()} · ${t} CET`;
 }
 updateTime();
 setInterval(updateTime, 60000);
