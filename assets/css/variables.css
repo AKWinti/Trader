@@ -1,1 +1,4 @@
-:root { --bg: #040810; --accent: #00d4ff; --text: #c8deff; }
+variables.css
+components.css
+animations.css
+styles.css  ← MUSS ALS LETZTES
