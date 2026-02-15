@@ -3,23 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Crypto Signal Dashboard</title>
+  <title>Crypto Daytrader Signal Dashboard</title>
 
-  <!-- FONTS AUS indexOLD -->
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <!-- DEINE CSS DATEIEN -->
-  <link rel="stylesheet" href="assets/css/variables.css">
-  <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/animations.css">
+  <!-- Deine ausgelagerten Styles -->
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
 <body>
 
+<!-- ================= LOGIN SCREEN ================= -->
+
+<div id="loginScreen">
+  <div class="login-box">
+
+    <div class="login-logo">
+      <div class="login-logo-icon">◈</div>
+      <div class="login-title">CRYPTO SIGNAL</div>
+      <div class="login-sub">DAYTRADER ACCESS</div>
+    </div>
+
+    <div class="login-field">
+      <label class="login-label">Username</label>
+      <input class="login-input" id="userInput" placeholder="admin">
+    </div>
+
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <input type="password" class="login-input" id="passInput" placeholder="••••">
+    </div>
+
+    <button class="login-btn" onclick="login()">ENTER</button>
+
+    <div class="login-error" id="loginError">
+      ACCESS DENIED
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= MAIN APP ================= -->
+
+<div id="app" style="display:none">
+
 <div class="container">
 
-  <!-- ===== HEADER ===== -->
+  <!-- HEADER -->
   <header>
     <div class="logo">
       <div class="logo-icon">◈</div>
@@ -31,59 +62,108 @@
 
     <div class="header-right">
       <div class="live-badge">
-        <span class="live-dot"></span>
-        LIVE
+        <span class="live-dot"></span> LIVE
       </div>
       <div class="timestamp" id="timestamp">--:--:--</div>
     </div>
   </header>
 
-  <!-- ===== GRID ===== -->
-  <div id="coinGrid" class="grid"></div>
+  <!-- COIN SELECTOR -->
+  <div class="selector-bar">
+    <span class="selector-label">SELECT COIN</span>
 
-  <div class="footer">
-    Binance Live Data • Auto Refresh 15s
+    <select id="coinSelect" class="coin-select">
+      <option value="BTCUSDT">BTC</option>
+      <option value="ETHUSDT">ETH</option>
+      <option value="SOLUSDT">SOL</option>
+      <option value="XRPUSDT">XRP</option>
+    </select>
+
+    <button class="analyze-btn" onclick="loadCoin()">ANALYZE</button>
+  </div>
+
+  <!-- PRICE HERO -->
+  <div class="price-hero">
+
+    <div class="current-price">
+      <div class="price-label">CURRENT PRICE</div>
+      <div class="price-value" id="price">--</div>
+      <div class="price-change" id="change">--</div>
+    </div>
+
+    <!-- SIGNAL -->
+    <div id="signalBox" class="signal-box neutral">
+      <div class="signal-label">SIGNAL</div>
+      <div class="signal-value" id="signalText">HOLD</div>
+      <div class="signal-sub">AI ANALYSIS</div>
+    </div>
+
   </div>
 
 </div>
+</div>
 
+<!-- ================= SCRIPT ================= -->
 
-<!-- ===== SCRIPT ===== -->
 <script>
-const grid = document.getElementById("coinGrid");
+function login() {
+  const u = document.getElementById("userInput").value;
+  const p = document.getElementById("passInput").value;
 
-async function loadData() {
-
-  const res = await fetch("https://api.binance.com/api/v3/ticker/24hr");
-  const data = await res.json();
-
-  grid.innerHTML = "";
-
-  data
-    .filter(c => c.symbol.endsWith("USDT"))
-    .slice(0, 12)
-    .forEach(c => {
-
-      const change = parseFloat(c.priceChangePercent);
-      const changeClass = change >= 0 ? "up" : "down";
-
-      const el = document.createElement("div");
-      el.className = "card";
-      el.innerHTML = `
-        <div class="symbol">${c.symbol.replace("USDT","")}</div>
-        <div class="price">$ ${Number(c.lastPrice).toLocaleString()}</div>
-        <div class="${changeClass}">
-          ${change >= 0 ? "+" : ""}${change.toFixed(2)}%
-        </div>
-      `;
-
-      grid.appendChild(el);
-    });
+  if (u === "admin" && p === "1234") {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+  } else {
+    document.getElementById("loginError").classList.add("show");
+  }
 }
 
-loadData();
-setInterval(loadData, 15000);
-</script>
+setInterval(() => {
+  document.getElementById("timestamp").textContent =
+    new Date().toLocaleTimeString();
+}, 1000);
+
+async function loadCoin() {
+
+  const symbol = document.getElementById("coinSelect").value;
+
+  const res = await fetch(
+    `https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`
+  );
+
+  const data = await res.json();
+
+  const price = Number(data.lastPrice).toLocaleString();
+  const change = parseFloat(data.priceChangePercent);
+
+  document.getElementById("price").textContent = "$ " + price;
+
+  const changeEl = document.getElementById("change");
+  changeEl.textContent =
+    (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
+
+  changeEl.className =
+    "price-change " + (change >= 0 ? "up" : "down");
+
+  // Fake Signal Engine
+  const signalBox = document.getElementById("signalBox");
+  const signalText = document.getElementById("signalText");
+
+  if (change > 2) {
+    signalBox.className = "signal-box buy";
+    signalText.textContent = "BUY";
+  }
+  else if (change < -2) {
+    signalBox.className = "signal-box sell";
+    signalText.textContent = "SELL";
+  }
+  else {
+    signalBox.className = "signal-box neutral";
+    signalText.textContent = "HOLD";
+  }
+}
+
+loadCoin();
 </script>
 
 </body>
